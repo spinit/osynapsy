@@ -1,0 +1,24 @@
+{
+    "name": "osynapsy.org/osynapsy",
+    "version": "0.1",
+    "homepage": "http://www.osynapsy.org/",
+    "type": "library",
+    "description": "Osynapsy is a framework MVC for develop Rich Internet Application (RIA).",
+    "keywords": ["Framework","Rich application","MVC"],
+    "license": "LGPLv3",
+    "authors": [
+        {
+            "name": "Pietro Celeste2",
+            "email": "p.celeste@opensymap.org",
+            "homepage": "http://https://github.com/opensymap/osy/wiki"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.3"
+    },
+    "autoload" : {
+        "psr-4": {
+            "Osynapsy\\": "vendor/org.osynapsy/osynapsy/src/"
+        }
+    }
+}
