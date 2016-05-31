@@ -71,7 +71,10 @@ abstract class Controller implements InterfaceController
         if ($this->model) {
             $this->model->find();
         }
-        $this->indexAction();
+        $resp = $this->indexAction();
+        if ($resp) {
+            $this->response->addContent($resp);
+        }
         return $this->response;
     }
     
