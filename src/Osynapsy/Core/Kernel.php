@@ -102,6 +102,23 @@ class Kernel
         }
     }
 
+    public static function set($p,$v)
+    {
+        $ksearch = explode('.',$p);
+        $klast   = count($ksearch)-1;
+        $target = &self::$repo;
+        foreach($ksearch as $i => $k){
+            if ($klast == $i){
+                $target[$k] = $v;
+            } elseif (array_key_exists($k,$target)) {
+                $target = &$target[$k];
+            } elseif(count($ksearch) != ($i+1)) {
+                $target[$k] = array();
+                $target = &$target[$k];
+            }
+        }
+    }
+    
     public function get($p)
     {
         if (empty($p)) {
@@ -118,42 +135,6 @@ class Kernel
         return $target;
     }
 
-    //Registro la funzione da eseguire a seguito dello scatenarsi di un evento
-    public static function on($evt,$fnc)
-    {
-        if (!array_key_exists($evt,self::$repo['events'])){
-            self::error('alert',"Event {$evt} not exists.\n\n Impossible regsiter/execute function.");
-            return;
-        }
-        self::$repo['events'][$evt][] = $fnc;
-    }
-
-    //Eseguo gli eventi
-    public function fire($event,$par=array())
-    {
-       if (!array_key_exists($event,self::$repo['events'])){
-            self::error('alert','Recall event '.$event.' inexistent');
-       }
-       foreach(self::$repo['events'][$event] as $i => $function){
-            try {
-                if ($err = $function()){
-                    self::error('alert',$err);
-                }
-            } catch (Exception $e){
-                self::error('alert',$e->getMessage());
-            }
-        }
-    }
-
-    //Registro
-    public function registerEvent($name)
-    {
-       if (array_key_exists($name, self::$repo['events'])) {
-           return;
-       }
-       self::$repo['events'][$name] = array();
-    }
-
     public static function sendEmail($from,$a,$subject,$body,$html=false)
     {
         $head = "From: $from\r\n".
@@ -166,22 +147,5 @@ class Kernel
           $head .= "Content-Transfer-Encoding: 7bit\n\n";
         }
         return mail($a,$subject,$body,$head," -f ".$from);
-    }
-
-    public static function set($p,$v)
-    {
-        $ksearch = explode('.',$p);
-        $klast   = count($ksearch)-1;
-        $target = &self::$repo;
-        foreach($ksearch as $i => $k){
-            if ($klast == $i){
-                $target[$k] = $v;
-            } elseif (array_key_exists($k,$target)) {
-                $target = &$target[$k];
-            } elseif(count($ksearch) != ($i+1)) {
-                $target[$k] = array();
-                $target = &$target[$k];
-            }
-        }
     }
 }

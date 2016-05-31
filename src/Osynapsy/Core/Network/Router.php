@@ -63,8 +63,12 @@ class Router
         
         //$pattern = '|'.str_replace('?','(.w)',$url).'|';
         $pattern = str_replace(
-            array_keys($this->patternPlaceholder),
-            array_values($this->patternPlaceholder),
+            array_keys(
+                $this->patternPlaceholder
+            ),
+            array_values(
+                $this->patternPlaceholder
+            ),
             $url
         );
         preg_match('|^'.$pattern.'$|', $this->request->get('query.q'), $out);

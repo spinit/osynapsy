@@ -18,7 +18,7 @@
     },
     "autoload" : {
         "psr-4": {
-            "Osynapsy\\": "vendor/org.osynapsy/osynapsy/src/"
+            "Osynapsy\\": "src/"
         }
     }
 }
