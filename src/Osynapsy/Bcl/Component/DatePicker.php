@@ -1,9 +1,9 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynapsy\Ocl\Component\InputBox;
+use Osynapsy\Ocl\Component\Component;
 
-class DatePicker extends InputBox
+class DatePicker extends Component
 {
     private $text;
     private $datePickerId;
@@ -13,14 +13,15 @@ class DatePicker extends InputBox
         $this->datePickerId = $id;
         $this->requireJs('/vendor/osynapsy/Bcl/DatePicker/script.js');
         $this->requireCss('/vendor/osynapsy/Bcl/DatePicker/style.css');
-        parent::__construct('text',$id.'_datepicker');
-        $this->att('class','input-group date date-picker form-control');
-        $this->add(new TextBox($id))->att('readonly','readonly');
+        parent::__construct('div',$id.'_datepicker');
+        $this->att('class','input-group');
+        $this->add(new TextBox($id))->att('class','date date-picker form-control');
         $this->add('<span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>');
     }
     
     protected function __build_extra__()
     {
+        var_dump($_REQUEST[$this->datePickerId]);
         if (!empty($_REQUEST[$this->datePickerId])) {
             $data = $_REQUEST[$this->datePickerId];
             $data = explode('-',$data);
