@@ -40,7 +40,7 @@ abstract class Controller implements InterfaceController
     {
         $this->response = new JsonResponse();
         $cmd = $_REQUEST[$this->keyCommand];
-        sleep(0.7);
+        //sleep(0.7);
         if (!method_exists($this, $cmd.'Action')) {
             $res = 'No action '.$cmd.' exist';
         } elseif (!empty($_REQUEST['actionParameters'])){

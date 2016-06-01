@@ -35,7 +35,7 @@ class Dictionary implements \ArrayAccess, \Iterator, \Countable
                 } else {
                     $target[$k] = array($value);
                 }
-            } elseif (array_key_exists($k, $target)) {
+            } elseif (is_array($target) && array_key_exists($k, $target)) {
                 $target = &$target[$k];
             } elseif(count($ksearch) != ($i+1)) {
                 $target[$k] = array(); 
