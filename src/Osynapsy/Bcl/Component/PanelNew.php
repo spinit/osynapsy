@@ -15,9 +15,9 @@ class PanelNew extends Component
     private $currentRow = null;
     private $currentColumn = null;
     
-    public function __construct($id, $title='', $class = ' panel-default')
+    public function __construct($id, $title='', $class = ' panel-default', $tag = 'div')
     {
-        parent::__construct('div', $id);
+        parent::__construct($tag, $id);
         $this->att('class','panel'.$class);
         if (!empty($title)) {
             $this->sections['head'] = new Tag('div');

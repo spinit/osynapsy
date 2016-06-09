@@ -118,7 +118,7 @@ class DbOci
             throw new \Exception($e['message']);
             return;
         }
-        if (!empty($par)) {
+        if (!empty($par) && is_array($par)) {
             foreach ($par as $k => $v) {
                 $$k = $v;
                 // oci_bind_by_name($rs, $k, $v) does not work
@@ -130,7 +130,7 @@ class DbOci
         }
         
         $ok = $this->__transaction ? @oci_execute($rs, OCI_NO_AUTO_COMMIT) : @oci_execute($rs);
-        //echo $cmd;
+        
         if (!$ok) {
             $e = oci_error($rs);  // For oci_parse errors pass the connection handle
             throw new \Exception($e['message']);
@@ -212,7 +212,7 @@ class DbOci
         return $cols;
     }
 
-    public function insert($table, $values, $keys=array())
+    public function insert($table, $values, $keys = array())
     {
         $command  = 'INSERT INTO '.$table;
         $command .= '('.implode(',', array_keys($values)).')';

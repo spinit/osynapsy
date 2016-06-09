@@ -91,4 +91,9 @@ class JsonResponse extends Response
         }
         $this->repo['content'][$typ][] = array($act,$val);
     }
+    
+    public function js($cmd)
+    {
+        $this->message('command','execCode', $cmd);
+    }
 }

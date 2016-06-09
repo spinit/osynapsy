@@ -21,7 +21,6 @@ class DatePicker extends Component
     
     protected function __build_extra__()
     {
-        var_dump($_REQUEST[$this->datePickerId]);
         if (!empty($_REQUEST[$this->datePickerId])) {
             $data = $_REQUEST[$this->datePickerId];
             $data = explode('-',$data);

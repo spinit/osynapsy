@@ -10,6 +10,7 @@ abstract class Model
 {
     private $repo;
     protected $controller = null;
+    protected $sequence = null;
     protected $table = null;
     protected $db = null;
     protected $values = array();
@@ -41,6 +42,11 @@ abstract class Model
     {
         $this->repo->get($key, $value, $append);
         return $this;
+    }
+    
+    public function setSequence($seq)
+    {
+        $this->sequence = $seq;
     }
     
     public function delete()
@@ -79,16 +85,25 @@ abstract class Model
         return array('command' => array(array($action,$parameter)));
     }
     
-    public function insert($values)
+    public function insert($values, $where=null)
     {
         $this->beforeInsert();
+        
         if ($this->controller->response->error()) {
             return;
         }
+        
         if ($this->debug) {
             mail($this->debug,'Debug mail',print_r($this->repo->get('table'),true).' '.print_r($values,true));
         }
-        $lastId = $_REQUEST['pk'] = $this->db->insert($this->repo->get('table'), $values);
+        $lastId = null;
+         
+        if ($this->sequence && is_array($where) && count($where) == 1) {
+            $_REQUEST['pk'] = $lastId = $values[$where[0]] = $this->db->execUnique("SELECT {$this->sequence}.nextval FROM DUAL",'NUM');
+            $this->db->insert($this->repo->get('table'), $values);
+        } else {
+            $lastId = $_REQUEST['pk'] = $this->db->insert($this->repo->get('table'), $values);
+        }
         if (!empty($_REQUEST['pk'])) {
             if ($pkField = $this->repo->get('pkField')) {
                 $pkField->setValue($_REQUEST['pk']);
@@ -186,6 +201,7 @@ abstract class Model
         $this->beforeExec();
         $values = array();
         $where = array();
+        $keys = array();
         
         foreach ($this->repo->get('fields') as $k => $f) {
             $val = $f->value;
@@ -213,8 +229,11 @@ abstract class Model
                     }
                     break;
             }
-            if ($f->isPkey() && !empty($val)) {
-                $where[$f->name] = $val;
+            if ($f->isPkey()) {
+                $keys[] = $f->name;
+                if (!empty($val)) {
+                    $where[$f->name] = $val;
+                }
             }
             if (!$f->readonly) {
                 $values[$f->name] = $val; 
@@ -244,9 +263,9 @@ abstract class Model
             return; 
         }        
         if (empty($where)) {
-            $this->insert($values);
+            $this->insert($values, $keys);
         } else {
-            $this->update($values,$where);
+            $this->update($values, $where);
         }
         $this->afterExec();
     }

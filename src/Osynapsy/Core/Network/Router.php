@@ -5,14 +5,15 @@ use Osynapsy\Core\Request\Request as Request;
 
 class Router
 {
-    private $routes;
     public $request;
+    private $routes;
     private $debug=false;
     //Rispettare l'ordine
     private $patternPlaceholder = array(
         '?i' => '([\\d]+){1}', 
-        '?I' => '([\\d]+){0}',
-        '?w' => '([\\w]+){1}', 
+        '?I' => '([\\d]*){1}',
+        '?.' => '([.]+){1}',
+        '?w' => '([\\w-]+){1}', 
         '?'  => '(.*){1}', 
         '/'  => '\\/'        
     );
@@ -61,7 +62,6 @@ class Router
            return;
         }
         
-        //$pattern = '|'.str_replace('?','(.w)',$url).'|';
         $pattern = str_replace(
             array_keys(
                 $this->patternPlaceholder
