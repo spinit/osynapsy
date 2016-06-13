@@ -18,8 +18,8 @@ class ImageBox extends Component
              ->att('class','hidden')
              ->att('id',$id.'_file')
              ->name = $id;
-        Kernel::$controller->response->addContent('<link href="/vendor/osynapsy/css/ImageBox.css" rel="stylesheet"></link>','head');
-        Kernel::$controller->response->addContent('<script src="/vendor/osynapsy/js/ImageBox.js"></script>','head');
+        $this->requireCss('/vendor/osynapsy/Bcl/ImageBox/style.css');
+        $this->requireJs('/vendor/osynapsy/Bcl/ImageBox/script.js');
     }
 
     protected function __build_extra__()

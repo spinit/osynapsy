@@ -8,7 +8,8 @@ use Osynapsy\Core\Lib\Tag as Tag;
  */
 class Component extends Tag
 {
-    protected static $require = array();
+    protected $data = array();
+    protected static $require = array();    
     protected static $ids = array();
     protected $__par = array();
 
@@ -95,5 +96,15 @@ class Component extends Tag
     public static function requireCss($file)
     {
         self::requireFile($file,'css');
+    }
+    
+    public function getParameter($par)
+    {
+        return array_key_exists($key, $this->__par) ? $this->__par[$key] : null;
+    }
+    
+    public function setData($data)
+    {
+        $this->data = $data;
     }
 }

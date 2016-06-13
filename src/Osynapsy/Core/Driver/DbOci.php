@@ -294,5 +294,14 @@ class DbOci
     {
         oci_close($this->cn);
     }
+    
+    public function dateToSql($date)
+    {
+        $app = explode('/',$date);
+        if (count($app) === 3){
+            return "{$app[2]}-{$app[1]}-{$app[0]}";
+        }
+        return $date;
+    }
 /*End class*/
 }

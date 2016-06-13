@@ -7,7 +7,7 @@ class ListUnordered extends Component
 {
     protected $data = array();
     protected $mainTag;
-    protected $itemTag;
+    protected $itemTag='li';
     
     public function __construct($name, $tag='ul')
     {

@@ -10,6 +10,7 @@ class SortableList extends ListUnordered
     private $label;
     private $labelColor;
     private $classType = 'sortable-list-destination';
+    private $ListConnected;
     
     public function __construct($name)
     {
@@ -25,17 +26,22 @@ class SortableList extends ListUnordered
     {
         $this->att('class', $this->classType, true);
         foreach ($this->data as $rec) {
-            $li = $this->add(new Tag('li'))->att('data-value',$rec[0]);
+            $li = $this->add(new Tag('li'))
+                       ->att('data-source',$this->id)
+                       ->att('data-value',$rec[0]);
             if ($this->label) {
                 $li->add('<span class="label '.$this->labelColor.'">'.$this->label.'</span> ');
             }
             $li->add($rec[1]);
+            $li->add('<span class="sortable-list-item-plus glyphicon glyphicon-plus"></span>');
+            $li->add('<span class="sortable-list-item-minus glyphicon glyphicon-minus"></span>');
         }
     }
     
-    public function connectTo($elementId)
+    public function connectTo(SortableList $list)
     {
-        $this->att('data-connected',$elementId);
+        $this->ListConnected = $list;
+        $this->att('data-connected',$this->ListConnected->id);
         return $this;
     }
     

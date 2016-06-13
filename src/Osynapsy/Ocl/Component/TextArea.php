@@ -11,6 +11,8 @@ class TextArea extends Component
     
     public function __build_extra__()
     {
-        $this->add($_REQUEST[$this->id]);
+        if (!empty($_REQUEST[$this->id])) {
+            $this->add($_REQUEST[$this->id]);
+        }
     }
 }

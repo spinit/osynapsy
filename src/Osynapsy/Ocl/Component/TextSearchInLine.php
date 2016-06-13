@@ -42,8 +42,8 @@ class TextSearchInLine extends Component
         $this->hdnBox = $this->add(new HiddenBox($name));
         $this->searchBox = $this->add(new TextBox($name.'_lbl'))->att('class','form-control');
         $this->spanSrc = $this->add(new Tag('span'))->att('class','fa fa-search input-group-addon');
-        Kernel::$controller->response->addContent('<link rel="stylesheet" href="/vendor/osynapsy/css/TextSearchInLine.css">','css');
-        Kernel::$controller->response->addContent('<script src="/vendor/osynapsy/js/TextSearchInLine.js"></script>','js');
+        $this->requireCss('/vendor/osynapsy/Bcl/TextSearchInLine/style.css');
+        $this->requireJs('/vendor/osynapsy/Bcl/TextSearchInLine/script.js');
     }
     
     public function __build_extra__()
