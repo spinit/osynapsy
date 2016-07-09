@@ -82,7 +82,7 @@ class HtmlResponse extends Response
     
     public function addJsCode($code)
     {
-        $this->addContent('<script>'.$code.'</script>', 'js', true);
+        $this->addContent('<script>'.PHP_EOL.$code.PHP_EOL.'</script>', 'js', true);
     }
     
     public function addCss($path)
