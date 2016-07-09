@@ -80,6 +80,11 @@ class HtmlResponse extends Response
         $this->addContent('<script src="'.$path.'"></script>', 'js', true);
     }
     
+    public function addJsCode($code)
+    {
+        $this->addContent('<script>'.$code.'</script>', 'js', true);
+    }
+    
     public function addCss($path)
     {
         $this->addContent('<link href="'.$path.'" rel="stylesheet" />', 'css', true);
