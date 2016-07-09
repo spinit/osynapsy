@@ -40,7 +40,7 @@ class LabelBox extends Component
         if (is_null($this->label)) {
             $this->add($_REQUEST[$this->hiddenBox->id]);
         } else {
-            $this->add($this->label);
+            $this->add('<span>'.$this->label.'</span>');
         }
     }
 }
