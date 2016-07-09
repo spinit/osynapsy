@@ -303,5 +303,10 @@ class DbOci
         }
         return $date;
     }
+    
+    public function setDateFormat($format = 'YYYY-MM-DD')
+    {
+        $this->execCommand("ALTER SESSION SET NLS_DATE_FORMAT = '{$format}'");
+    }
 /*End class*/
 }
