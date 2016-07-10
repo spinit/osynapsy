@@ -141,11 +141,10 @@ class Panel extends Component
     
     public function buildLabel(&$obj, $colspan)
     {
+        $style='';
         if (is_object($obj['obj']) && ($obj['obj']->tag == 'button')) {
-            unset($obj['lbl']);
-            if ($this->getParameter('label-position') == 'outside') {
-                $colspan=2;
-            }
+           $obj['lbl'] = '&nbsp';
+           $style = 'display: block';
         }
         if (empty($obj['lbl'])) {
             return;
@@ -162,8 +161,11 @@ class Panel extends Component
         $label = new Tag('label');
         $label->att('class',($obj['obj'] instanceof panel ? 'osy-form-panel-label' : 'osy-component-label'))
               ->att('class',(is_object($obj['obj']) ? $obj['obj']->get_par('label-class') : ''),true)
-              ->att('for',$obj['obj']->id)
+              ->att('for',$obj['obj']->id)              
               ->add(trim($labelText));
+        if (!empty($style)) {
+            $label->att('style',$style);
+        }
         switch ($this->formType) {
             case 'horizontal':
                 $label->att('class','control-label col-sm-2 col-lg-2',true);
