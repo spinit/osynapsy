@@ -17,9 +17,9 @@ class Form extends Component
     private $body;
     private $foot;
 
-    public function __construct($name, $mainComponent = 'Panel')
+    public function __construct($name, $mainComponent = 'Panel', $tag = 'form')
     {
-        parent::__construct('form',$name);
+        parent::__construct($tag, $name);
         //Form setting
         $this->att('name',$name)
              ->att('method','post')
@@ -28,8 +28,7 @@ class Form extends Component
         //Body setting
         $this->body = new $mainComponent($name.'_panel', 'div');
         $this->body->par('label-position','inside');
-        $this->body->tagdep =& $this->tagdep;
-        
+        $this->body->tagdep =& $this->tagdep;        
     }
     
     protected function __build_extra__()
