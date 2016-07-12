@@ -107,4 +107,9 @@ class Component extends Tag
     {
         $this->data = $data;
     }
+    
+    public function setClass($class,$append=true)
+    {
+        return $this->att('class',' '.$class, $append);
+    }
 }
