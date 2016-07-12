@@ -34,9 +34,9 @@ class ListBox extends Component
                 $this->box->set($rec[1]);
                 $selected = ' selected';
             }
-            $list->add(new Tag('li'))
-                 ->att('value',$rec[0])
+            $list->add(new Tag('li'))                
                  ->add(new Tag('div'))
+                 ->att('value',$rec[0])
                  ->att('class','listbox-list-item'.$selected)
                  ->add($rec[1]);
         }
