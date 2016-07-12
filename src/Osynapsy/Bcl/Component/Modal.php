@@ -11,6 +11,7 @@ class Modal extends Component
     public $title;
     public $body;
     public $footer;    
+    
     public function __construct($id, $title='', $type='')
     {
         parent::__construct('div',$id);
@@ -33,10 +34,12 @@ class Modal extends Component
     public function addFooter($content)
     {
         $this->footer->add($content);
+        return $content;
     }
     
     public function addBody($content)
     {
         $this->body->add($content);
+        return $content;
     }
 }
