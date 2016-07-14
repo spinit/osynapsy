@@ -29,8 +29,7 @@ class CheckList extends Component
         if (!empty($_REQUEST[$this->id]) && in_array($value[0],$_REQUEST[$this->id])) {
             $value['selected'] = true;
         }
-        $tr->add(new Tag('td'))
-           ->att('style','padding: 5px')
+        $tr->add(new Tag('td'))           
            ->add(str_repeat('&nbsp;',$lev*7).'<input type="checkbox" class="i-checks" name="'.$this->id.'[]" value="'.$value[0].'"'.(!empty($value['selected']) ? ' checked' : '').'>&nbsp;'.$value[1]);
         if (!empty($this->groups[$value[0]])) {
             $lev += 1;
