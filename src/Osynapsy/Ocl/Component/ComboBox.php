@@ -9,6 +9,7 @@ class ComboBox extends Component
 {
     public $__dat = array();
     public $__grp = array();
+    public $isTree = false;
     public $dba = null;
     public $placeholder = '- Seleziona -';
     
@@ -31,7 +32,7 @@ class ComboBox extends Component
                 return;
             }
         }
-        if (!empty($this->__dat) && array_key_exists('_group',$this->__dat[0])) {
+        if (!empty($this->__dat) && $this->isTree && array_key_exists(2,$this->__dat[0])) {
             if (!$this->get_par('option-select-disable')){  array_unshift($this->__dat,array('','- select -','_group'=>'')); }
             $this->buildTree($this->__dat);
         } else {
@@ -60,7 +61,7 @@ class ComboBox extends Component
     
     public function addOption($opt_val,$opt_lbl)
     {
-        $cmp_val = get_global($this->name,$_REQUEST);        
+        $cmp_val = $this->getGlobal($this->name,$_REQUEST);        
         $opt = $this->add(tag::create('option'))->att('value',$opt_val);
         $opt->add(nvl($opt_lbl,$opt_val));
         if ($cmp_val == $opt_val) {
@@ -72,10 +73,10 @@ class ComboBox extends Component
     {
         $dat = array();
         foreach ($res as $k => $rec) {
-            if (empty($rec['_group'])) {
+            if (empty($rec[2])) {
                 $dat[] = $rec;
             } else {
-                $this->__grp[$rec['_group']][] = $rec;
+                $this->__grp[$rec[2]][] = $rec;
             }
         }
         $this->buildBranch($dat);
@@ -85,7 +86,7 @@ class ComboBox extends Component
     {
         if (empty($dat)) return;
         $len = count($dat)-1;
-        $cur_val = get_global($this->name, $_REQUEST);
+        $cur_val = $this->getGlobal($this->name, $_REQUEST);
         foreach ($dat as $k => $rec) {
             $val = array();
             foreach ($rec as $j => $v) {
@@ -98,7 +99,7 @@ class ComboBox extends Component
             $sel = ($cur_val == $val[0]) ? ' selected' : '';
             $opt = $this->add(tag::create('option'))
                         ->att('value',$val[0]);
-            $opt->add(nvl($val[1],$val[0]));
+            $opt->add($this->nvl($val[1],$val[0]));
             if ($cur_val == $val[0]) {
                 $opt->att('selected','selected');
             }
@@ -148,5 +149,10 @@ class ComboBox extends Component
         if ($param) {
             $this->__par['datasource-sql-par'] = $param;
         }
+    }
+    
+    public function setTree($active=true)
+    {
+        $this->isTree = $active;
     }
 }
