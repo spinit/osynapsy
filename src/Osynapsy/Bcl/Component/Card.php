@@ -4,6 +4,10 @@ namespace Osynapsy\Bcl\Component;
 use Osynapsy\Ocl\Component\Component as OclComponent;
 use Osynapsy\Core\Lib\Tag;
 
+/**
+ * Build a card
+ * 
+ */
 class Card extends OclComponent
 {
     public function __construct($name, $title=null)
