@@ -1,7 +1,7 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynpasy\Ocl\Component\CheckList;
+use Osynapsy\Ocl\Component\CheckList as OclCheckList;
 
 class CheckList extends OclCheckList
 {
