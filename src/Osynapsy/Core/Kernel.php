@@ -131,7 +131,7 @@ class Kernel
                 return $target;
             }
             $target = array_key_exists($k, $target) ? $target[$k] : null;
-        }
+        }        
         return $target;
     }
 
