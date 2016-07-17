@@ -237,7 +237,7 @@ class DbOci
         return $res;
     }
 
-    public function update($table,array $values,array $condition)
+    public function update($table, array $values, array $condition)
     {
         $fields = array();
         $where = array();
@@ -245,6 +245,10 @@ class DbOci
             $fields[] = "{$field} = :{$field}";
         }
         foreach ($condition as $field => $value) {
+            if (is_null($value)) {
+                $where[] = "$field is null";
+                continue;
+            }
             $where[] = "$field = :WHERE_{$field}";
             $values['WHERE_'.$field] = $value;
         }
