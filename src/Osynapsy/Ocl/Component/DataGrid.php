@@ -664,11 +664,11 @@ class DataGrid extends Component
             return;
         }
         $fot = '<div class="osy-datagrid-2-foot text-center">';
-        $fot .= '<button type="button" name="btn_pag" data-mov="start" value="&lt;&lt;" class="btn btn-primary btn-sm osy-datagrid-2-paging">&lt;&lt;</button>';
-        $fot .= '<button type="button" name="btn_pag" data-mov="-1" value="&lt;" class="btn btn-primary btn-sm  osy-datagrid-2-paging">&lt;</button>';
+        $fot .= '<button type="button" name="btn_pag" data-mov="start" value="&lt;&lt;" class="btn btn-primary btn-xs osy-datagrid-2-paging">&lt;&lt;</button>';
+        $fot .= '<button type="button" name="btn_pag" data-mov="-1" value="&lt;" class="btn btn-primary btn-xs  osy-datagrid-2-paging">&lt;</button>';
         $fot .= '<span>&nbsp;<input type="hidden" name="'.$this->id.'_pag" id="'.$this->id.'_pag" value="'.$this->__par['pag_cur'].'" class="osy-datagrid-2-pagval history-param" data-pagtot="'.$this->__par['pag_tot'].'"> Pagina '.$this->__par['pag_cur'].' di <span id="_pag_tot">'.$this->__par['pag_tot'].'</span>&nbsp;</span>';
-        $fot .= '<button type="button" name="btn_pag" data-mov="+1" value="&gt;" class="btn btn-primary btn-sm  osy-datagrid-2-paging">&gt;</button>';
-        $fot .= '<button type="button" name="btn_pag" data-mov="end" value="&gt;&gt;" class="btn btn-primary btn-sm  osy-datagrid-2-paging">&gt;&gt;</button>';
+        $fot .= '<button type="button" name="btn_pag" data-mov="+1" value="&gt;" class="btn btn-primary btn-xs  osy-datagrid-2-paging">&gt;</button>';
+        $fot .= '<button type="button" name="btn_pag" data-mov="end" value="&gt;&gt;" class="btn btn-primary btn-xs  osy-datagrid-2-paging">&gt;&gt;</button>';
         $fot .= '</div>';
         $this->add($fot);
     }
