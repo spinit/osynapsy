@@ -7,7 +7,7 @@ use Osynapsy\Core\Kernel;
 
 class ImageProcessor
 {
-    public $errors = array();
+    public static $errors = array();
     
     public static function getThumbnail($FilNam,$Dim)
     {
@@ -47,7 +47,7 @@ class ImageProcessor
         }
         $pathUpload = Kernel::get('parameters.path-upload');
         if (empty($pathUpload)){
-            Kernel::$controller->response->error('alert','configuration parameters.path-upload is empty');         
+            Kernel::$controller->response->error('alert','configuration parameters.path-upload is empty'.print_r(Kernel::get('parameter'),true));         
         } elseif (!is_dir($_SERVER['DOCUMENT_ROOT'].$pathUpload)) {
             Kernel::$controller->response->error('alert','path-upload '.$_SERVER['DOCUMENT_ROOT'].$pathUpload.' not exists');
         } elseif (!is_writeable($_SERVER['DOCUMENT_ROOT'].$pathUpload)) {
