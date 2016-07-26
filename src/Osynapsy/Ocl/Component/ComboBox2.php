@@ -39,7 +39,9 @@ class ComboBox2 extends Component
 
     private function buildLinear()
     {                
-        $this->addOption('','- select -');
+        if (!$this->multiple) {
+            $this->addOption('','- select -');
+        }
         foreach ($this->data as $raw) {
             $record = array_values($raw);            
             $this->addOption($record[0], $record[1]);
