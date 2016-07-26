@@ -26,7 +26,7 @@ class CheckList extends Component
     protected function buildRow($value, $lev=0)
     {
         $tr = $this->table->add(new Tag('tr'));
-        if (!empty($_REQUEST[$this->id]) && in_array($value[0],$_REQUEST[$this->id])) {
+        if (!empty($_REQUEST[$this->id]) && is_array($_REQUEST[$this->id]) && in_array($value[0],$_REQUEST[$this->id])) {
             $value['selected'] = true;
         }
         $tr->add(new Tag('td'))           
