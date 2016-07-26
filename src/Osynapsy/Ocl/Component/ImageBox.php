@@ -1,25 +1,24 @@
 <?php
-namespace Osynapsy\Core\Ocl\Component;
+namespace Osynapsy\Ocl\Component;
 
 use Osynapsy\Core\Kernel as Kernel;
 use Osynapsy\Core\Lib\Tag as Tag;
-use Osynapsy\Core\Ocl\Component\Component as Component;
-use Osynapsy\Core\Ocl\Component\HiddenBox as HiddenBox;
 
 class ImageBox extends Component
 {
     public function __construct($id)
     {
+        $this->requireCss('/vendor/osynapsy/Bcl/ImageBox/style.css');
+        $this->requireCss('/vendor/osynapsy/Bcl/ImageBox/jquery.Jcrop.min.css');
+        $this->requireJs('/vendor/osynapsy/Bcl/ImageBox/script.js');
         parent::__construct('div',$id);
-        $this->att('class','osy-imagebox');
+        $this->att('class','osy-imagebox')->att('data-action','save');
         $this->add(new HiddenBox($id));
-        $file = $this->add(tag::create('input'));
+        $file = $this->add(new Tag('input'));
         $file->att('type','file')
              ->att('class','hidden')
              ->att('id',$id.'_file')
              ->name = $id;
-        $this->requireCss('/vendor/osynapsy/Bcl/ImageBox/style.css');
-        $this->requireJs('/vendor/osynapsy/Bcl/ImageBox/script.js');
     }
 
     protected function __build_extra__()
@@ -34,6 +33,7 @@ class ImageBox extends Component
                 $img = '<img src="data:image/png;base64,'.base64_encode($_REQUEST[$this->id]).'">';
             } else {
                 if (file_exists($_SERVER['DOCUMENT_ROOT'].$_REQUEST[$this->id])) { 
+                    $filename = $_SERVER['DOCUMENT_ROOT'].$_REQUEST[$this->id];
                     $img = '<img src="'.$_REQUEST[$this->id].'">'; 
                 }
             }
@@ -46,7 +46,7 @@ class ImageBox extends Component
                     $this->add('<input  type="hidden" id="'.$this->id.'_crop" name="'.$this->id.'_crop" class="osy-imagebox-crop">');
                     $prw = $this->add(tag::create('div'))
                                 ->att('class','osy-imagebox-previewbox');
-                    $prw->add('<div style="width: 140px; height: 140px; overflow: hidden;"><img src="'.$_REQUEST[$this->id].'" class="osy-imagebox-preview"></div>');
+                    $prw->add('<div style="width: '.$dim_max[0].'px; height: '.$dim_max[1].'px; overflow: hidden;"><img src="'.$_REQUEST[$this->id].'" class="osy-imagebox-preview"></div>');
                     $prw->add('<span id="'.$this->id.'_get_crop" class="osy-imagebox-cmd-crop btn_cnf w100 center"><span class="fa fa-cut"></span> Taglia</span>');
                     $this->add('<img src="'.$_REQUEST[$this->id].'" class="osy-imagebox-master">');
                     return;
@@ -116,5 +116,10 @@ class ImageBox extends Component
         } catch (Exception $e) {
             return $e->getMessage();
         }
+    }
+    
+    public function setAction($action)
+    {
+        $this->att('data-action', $action);
     }
 }
