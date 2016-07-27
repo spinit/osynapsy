@@ -41,7 +41,12 @@ abstract class Response
         }
         $this->repo['content'][$part][] = $content;
     }
-        
+    
+    public function send($content, $part =  'main', $checkUnique = false)
+    {
+        $this->addContent($content, $part, $checkUnique);
+    }
+    
     public function exec()
     {
         $this->sendHeader();
