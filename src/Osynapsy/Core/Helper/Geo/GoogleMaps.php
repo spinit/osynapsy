@@ -9,10 +9,10 @@ namespace Osynapsy\Core\Helper\Geo;
 class GoogleMaps 
 {
     //put your code here
-    public static function getLatLng($add)
+    public static function getLatLng($address)
     {
-           $add = trim($add);
-           $geourl = "http://maps.googleapis.com/maps/api/geocode/xml?address={$add}&sensor=false&region=it";
+           $address = trim($address);
+           $geourl = "http://maps.googleapis.com/maps/api/geocode/json?address={$address}&sensor=false&region=it";
            
            // Create cUrl object to grab XML content using $geourl
            $c = curl_init();
@@ -21,16 +21,17 @@ class GoogleMaps
            curl_setopt($c, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
 		   //curl_setopt($c, CURLOPT_CONNECTTIMEOUT ,2);
 		   //curl_setopt($c, CURLOPT_TIMEOUT, 5);
-           $xmlContent = trim(curl_exec($c));
+           $resp = trim(curl_exec($c));
            //$r = curl_getinfo($c);
            curl_close($c);
-           // Create SimpleXML object from XML Content
-           $xmlObject = &simplexml_load_string($xmlContent);
+           // Create SimpleXML object from XML Content           
+           $obj = json_decode($resp);           
            // Print out all of the XML Object
-           if ($xmlObject->status) {
-               if ($xmlObject->status == 'OK') {
-                    return array((float)$xmlObject->result->geometry->location->lat,(float)$xmlObject->result->geometry->location->lng);
-               }
+           if ($obj->status && $obj->status == 'OK') {               
+               return array(
+                   $obj->results[0]->geometry->location->lat,
+                   $obj->results[0]->geometry->location->lng
+               );
            }
            return false;
     }
