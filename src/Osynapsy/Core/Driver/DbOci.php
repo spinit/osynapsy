@@ -135,15 +135,17 @@ class DbOci
             $e = oci_error($rs);  // For oci_parse errors pass the connection handle
             throw new \Exception($e['message']);
             return;
-        } elseif ($rs_return) {
+        } 
+        
+        if ($rs_return) {
             return $rs;
-        } else {
-            foreach ($par as $k=>$v) {
-                $par[$k] = $$k;
-            }
-            oci_free_statement($rs);
-            return $par;
+        } 
+        
+        foreach ($par as $k=>$v) {
+            $par[$k] = $$k;
         }
+        oci_free_statement($rs);
+        return $par;
     }
 
     public function execQuery($sql, $par = null, $fetchMethod = null)
