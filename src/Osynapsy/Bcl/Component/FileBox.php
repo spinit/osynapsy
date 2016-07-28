@@ -22,7 +22,7 @@ class FileBox extends Component
                 </span>
             </span>
         */
-        Kernel::$controller->response->addContent('<script src="/vendor/osynapsy/js/Bcl/FileBox.js"></script>','head');
+        $this->requireJs('/vendor/osynapsy/Bcl/FileBox/script.js');
         
         parent::__construct('dummy',$name);
         $this->span = $this->add(new Tag('span'));
@@ -32,7 +32,7 @@ class FileBox extends Component
                     ->att('class', 'input-group-btn')
                     ->add(new Tag('span'))
                     ->att('class','btn btn-primary btn-file')
-                    ->add('<span class="fa fa-folder-open"></span> Browse&hellip; <input type="file" name="'.$name.'">');        
+                    ->add('<input type="file" name="'.$name.'"><span class="fa fa-folder-open"></span>');
         $div->add('<input type="text" class="form-control" readonly>');
         if (!$postfix) {
             return;
