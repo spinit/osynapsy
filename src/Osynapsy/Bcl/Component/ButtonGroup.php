@@ -46,6 +46,6 @@ class ButtonGroup extends Component
     
     public function addSeparator()
     {
-        $this->ul(new Tag('li'))->att('class','divider')->att('role','separator');
+        $this->ul->add(new Tag('li'))->att('class','divider')->att('role','separator');
     }
 }
