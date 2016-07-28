@@ -17,7 +17,7 @@ class ButtonGroup extends Component
     public function __construct($name, $label, $class='')
     {
         parent::__construct('div', $name);
-        $this->att('class','button-group');
+        $this->att('class','btn-group');
         
         //Label button
         $this->b1 = $this->add(new Button('btn1'.$name))
