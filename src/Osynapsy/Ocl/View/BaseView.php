@@ -10,29 +10,42 @@ abstract class BaseView
     protected $components = array();
     protected $controller;
     protected $reponse;
-    protected $db;
+    protected $db;    
     
     public function __construct(Controller $controller, $title=null)
     {
         $this->controller = $controller;
         $this->request = $controller->request;
-        $this->db = $controller->getDb();
-        $this->response = $this->controller->response;
-        //new HtmlResponse($this->request->get('page.templateId'), $this->db);
+        $this->db = $controller->getDb();        
         if ($title) {
-            $this->response->addContent($title,'title');
+            $this->setTitle($title);
         }
+    }
+    
+    protected function add($part)
+    {
+       $this->controller->response->send($part);
     }
     
     public function get()
     {
         $this->init();
-        //return $this->response;
+        return;        
     }
 
     public function setTitle($title)
     {
-        $this->response->addContent($title,'title');
+        $this->controller->response->addContent($title,'title');
+    }
+    
+    public function addJs($path)
+    {    
+        $this->controller->response->addJs($path);
+    }
+    
+    public function addCss($path)
+    {    
+        $this->controller->response->addCss($path);
     }
     
     public function __toString()
