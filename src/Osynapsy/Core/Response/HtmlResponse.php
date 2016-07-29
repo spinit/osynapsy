@@ -7,15 +7,12 @@ use Osynapsy\Core\Kernel as Kernel;
 
 class HtmlResponse extends Response
 {
-    private $template = null;
+    public $template = null;
     
-    public function __construct($templateId = null, $controller = null)
+    public function __construct()
     {
         parent::__construct('text/html');
-        $this->repo['content'] = array('main' => '');
-        if (!empty($templateId)) {
-            $this->template = $this->loadTemplate($templateId, $controller);
-        }
+        $this->repo['content'] = array('main' => '');        
     }
     
     public function addBufferToContent($path = null, $part = 'main')
@@ -25,19 +22,10 @@ class HtmlResponse extends Response
         $this->addContent($buffer , $part);
     }
     
-    public static function loadTemplate($templateId, $param = null)
-    {
-        $template = '';
-        if ($path = Kernel::get('layouts.'.$templateId)) {
-            $template = self::getBuffer($path, $param);
-        }
-        return $template;
-    }
-    
     private function replaceContent($buffer)
     {
         $dummy = array_map(
-            function($v){
+            function ($v) {
                 return '<!--'.$v.'-->';
             },
             array_keys(
@@ -45,7 +33,7 @@ class HtmlResponse extends Response
             )
         );
         $parts = array_map(
-            function($p){
+            function ($p) {
                 return is_array($p) ? implode("\n",$p) : $p;
             },
             array_values(
