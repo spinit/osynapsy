@@ -5,7 +5,7 @@ use Osynapsy\Core\Request\Request;
 
 interface InterfaceController
 {
-    public function __construct(Request $request = null, $db = null);
+    public function __construct(Request $request = null, $db = null, $appController = null);
     
     public function getResponse();
 }
