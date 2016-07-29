@@ -66,8 +66,7 @@ abstract class Controller implements InterfaceController
     {
         if (!empty($_REQUEST[$this->keyCommand])) {
             return $this->execCommand();
-        }
-        
+        }        
         $this->response = new HtmlResponse();        
         if ($path = Kernel::get('layouts.'.$this->templateId)) {            
             $this->response->template = $this->response->getBuffer($path, $this);
