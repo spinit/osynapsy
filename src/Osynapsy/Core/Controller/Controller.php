@@ -15,14 +15,16 @@ abstract class Controller implements InterfaceController
     public $model;
     public $request;
     public $response;
+    public $app;
     
-    public function __construct(Request $request = null, $db = null)
+    public function __construct(Request $request = null, $db = null, $appController = null)
     {
         $this->templateId = $request->get('page.templateId');
         $this->parameters = $request->get('page.parameters');
         $this->request = $request;
         $this->setDbHandler($db);
-        $this->init();
+        $this->app = $appController;
+        $this->init();        
     }
     
     abstract public function indexAction();
