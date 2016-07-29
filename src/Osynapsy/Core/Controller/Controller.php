@@ -4,6 +4,7 @@ namespace Osynapsy\Core\Controller;
 use Osynapsy\Core\Request\Request;
 use Osynapsy\Ocl\Response\Html as HtmlResponse;
 use Osynapsy\Core\Response\JsonResponse;
+use Osynapsy\Core\Kernel;
 
 abstract class Controller implements InterfaceController
 {
@@ -66,10 +67,11 @@ abstract class Controller implements InterfaceController
         if (!empty($_REQUEST[$this->keyCommand])) {
             return $this->execCommand();
         }
-        $this->response = new HtmlResponse(
-            $this->templateId, 
-            $this
-        );
+        
+        $this->response = new HtmlResponse();        
+        if ($path = Kernel::get('layouts.'.$this->templateId)) {            
+            $this->response->template = $this->response->getBuffer($path, $this);
+        }
         if ($this->model) {
             $this->model->find();
         }
