@@ -68,8 +68,8 @@ abstract class Controller implements InterfaceController
             return $this->execCommand();
         }        
         $this->response = new HtmlResponse();        
-        if ($path = Kernel::get('layouts.'.$this->templateId)) {            
-            $this->response->template = $this->response->getBuffer($path, $this);
+        if ($path = Kernel::get('layouts.'.$this->templateId)) {
+            $this->response->template = $this->response->getBuffer($path, $this);            
         }
         if ($this->model) {
             $this->model->find();

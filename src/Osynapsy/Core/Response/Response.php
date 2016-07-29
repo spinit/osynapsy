@@ -65,16 +65,15 @@ abstract class Response
     {
         $buffer = 1;
         if (!empty($path)) {
-            if (is_file($path)) {
-                if (!empty($params)) {
-                    foreach($params as $key => $val){
-                        $$key = $val;
-                    }
-                }
-                $buffer = include $path;
-            } else {
-                throw new \Exception('File '.$path.' not exists');
+            if (!is_file($path)) {
+                throw new \Exception('File '.$path.' not exists');                
             }
+            if (!empty($params)) {
+                foreach($params as $key => $val){
+                    $$key = $val;
+                }
+            }
+            $buffer = include $path;
         }
         if ($buffer === 1) {
             $buffer = ob_get_contents();
