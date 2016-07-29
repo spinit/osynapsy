@@ -83,15 +83,6 @@ class Router
         $this->routes->set('current.attributes', $attr);
     }
     
-    public function getController($db)
-    {
-        if ($currentRoute = $this->routes->get('current')) {
-            $classController = $currentRoute['controller']; 
-            return new $classController($this->request, $db);
-        }
-        return null;
-    }
-    
     public function get($key)
     {
         return $this->routes->get($key);
