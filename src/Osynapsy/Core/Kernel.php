@@ -30,10 +30,9 @@ class Kernel
         self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');
         self::$router = new Router();
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');
+        self::$request = self::$router->getRequest();
         
-        $app = self::$router->getRoute('application');
-       
-        self::$request = self::$router->getRequest();       
+        $app = self::$router->getRoute('application');                   
         $run = true;
         //If app has applicationController instance it before recall route controller;
         if (!empty($app) && !empty(self::$repo['xmlconfig'][$app]['controller'])) {
@@ -44,11 +43,15 @@ class Kernel
             );
             $run = self::$appController->run();
         }
-        if ($run && self::$controller = self::$router->getController(self::$dba)) {
+        if ($run && $classController = self::$router->getRoute('controller')) {            
+            self::$controller = new $classController(
+                self::$request,
+                self::$dba, 
+                self::$appController
+            );
             return (string) self::$controller->getResponse();
-        } else {
-            return "Page not found";
-        }
+        } 
+        return "Page not found";        
     }
 
     private static function loadConfiguration($path)
