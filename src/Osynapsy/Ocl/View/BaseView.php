@@ -17,7 +17,8 @@ abstract class BaseView
         $this->controller = $controller;
         $this->request = $controller->request;
         $this->db = $controller->getDb();
-        $this->response = new HtmlResponse($this->request->get('page.templateId'), $this->db);
+        $this->response = $this->controller->response;
+        //new HtmlResponse($this->request->get('page.templateId'), $this->db);
         if ($title) {
             $this->response->addContent($title,'title');
         }
@@ -26,7 +27,7 @@ abstract class BaseView
     public function get()
     {
         $this->init();
-        return $this->response;
+        //return $this->response;
     }
 
     public function setTitle($title)
