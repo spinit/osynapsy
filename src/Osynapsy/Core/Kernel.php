@@ -63,7 +63,7 @@ class Kernel
         if (!empty(self::$repo['xmlconfig'][0]) && self::$repo['xmlconfig'][0]->app) {
             foreach (self::$repo['xmlconfig'][0]->app[0] as $e) {
                 $appName = $e->getName();
-                $appConf = __dir__.'/../../../../'.str_replace('_','/',$appName).'/etc/config.xml';
+                $appConf = filter_input(\INPUT_SERVER,'DOCUMENT_ROOT').'/../vendor/'.str_replace('_','/',$appName).'/etc/config.xml';                
                 if (is_file($appConf)) {
                     self::$repo['xmlconfig'][$appName] = simplexml_load_file($appConf);
                 }
