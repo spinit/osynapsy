@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Core\Model;
 
-use Osynapsy\Core\Kernel;
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Model\ModelField;
 use Osynapsy\Core\Util\ImageProcessor;
@@ -12,17 +11,16 @@ abstract class Model
     protected $controller = null;
     protected $sequence = null;
     protected $table = null;
-    protected $db = null;
-    protected $values = array();
-    protected $debug;
+    protected $db = null;   
+    protected $values = array();    
     protected $softdelete;
 
-    public function __construct($controller, $db = null)
+    public function __construct($controller)
     {
         $this->controller = $controller;
-        $this->db = empty($db) ? Kernel::$dba : $db;
+        $this->db = $this->controller->getDb();
         $this->repo = new Dictionary();
-        $this->repo->set('actions.after-insert', Kernel::get('page.url'))
+        $this->repo->set('actions.after-insert', $this->controller->request->get('page.url'))
                    ->set('actions.after-update', 'back')
                    ->set('actions.after-delete', 'back')
                    ->set('fields',array());
@@ -87,26 +85,21 @@ abstract class Model
     
     public function insert($values, $where=null)
     {
-        $this->beforeInsert();
-        
+        $this->beforeInsert();        
         if ($this->controller->response->error()) {
             return;
-        }
-        
-        if ($this->debug) {
-            mail($this->debug,'Debug mail',print_r($this->repo->get('table'),true).' '.print_r($values,true));
-        }
+        }        
         $lastId = null;
          
         if ($this->sequence && is_array($where) && count($where) == 1) {
-            $_REQUEST['pk'] = $lastId = $values[$where[0]] = $this->db->execUnique("SELECT {$this->sequence}.nextval FROM DUAL",'NUM');
+            $lastId = $values[$where[0]] = $this->db->execUnique("SELECT {$this->sequence}.nextval FROM DUAL",'NUM');
             $this->db->insert($this->repo->get('table'), $values);
         } else {
-            $lastId = $_REQUEST['pk'] = $this->db->insert($this->repo->get('table'), $values);
+            $lastId = $this->db->insert($this->repo->get('table'), $values);
         }
-        if (!empty($_REQUEST['pk'])) {
+        if (!empty($lastId)) {
             if ($pkField = $this->repo->get('pkField')) {
-                $pkField->setValue($_REQUEST['pk']);
+                $pkField->setValue($lastId);
             }
         }
         $this->afterInsert($lastId);
@@ -116,7 +109,7 @@ abstract class Model
                 $this->controller->response->go($this->repo->get('actions.after-insert'));                
                 break;
             default: 
-                $this->controller->response->go($this->repo->get('actions.after-insert').$_REQUEST['pk']);                
+                $this->controller->response->go($this->repo->get('actions.after-insert').$lastId);                
                 break;
         }
     }
@@ -126,9 +119,6 @@ abstract class Model
         $this->beforeUpdate();
         if ($this->controller->response->error()) {
             return;
-        }
-        if ($this->debug) {
-            mail($this->debug,'Debug mail',print_r($this->repo->get('table'),true).' '.print_r($values,true).' '.print_r($where,true));
         }
         $this->db->update($this->repo->get('table'), $values, $where);
         $this->afterUpdate();
@@ -141,9 +131,9 @@ abstract class Model
         $fields = $this->repo->get('fields');
         
         $k=0;
-        foreach ($fields as $i => $field) {
+        foreach ($fields as $field) {
             if ($field->isPkey()) {
-                $sqlWhere[] = $field->name . ' = :'.$k;
+                $sqlWhere[] = $field->name . ' = '.($this->db->getType() == 'oracle' ? ':'.$k : '?');
                 $sqlParam[] = $field->value;
                 $k++;
             } 
@@ -154,8 +144,7 @@ abstract class Model
             return; 
         }
         
-        $sql  = " SELECT *".PHP_EOL;
-        //$sql .= implode(',',$sqlField).PHP_EOL;
+        $sql  = " SELECT *".PHP_EOL;        
         $sql .= " FROM  ".$this->repo->get('table')." ".PHP_EOL;
         $sql .= " WHERE ".implode(' AND ',$sqlWhere);
         try {
@@ -211,7 +200,7 @@ abstract class Model
                 //continue;
             }
             if (!$f->isNullable() && $val !== '0' && empty($val)) {
-                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
+                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> ï¿½ obbligatorio.');
             }
             switch ($f->type) {
                 case 'float':
@@ -219,13 +208,13 @@ abstract class Model
                 case 'numeric':
                 case 'number':
                     if (filter_var($val, FILTER_VALIDATE_FLOAT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non ï¿½ numerico.');
                     }
                     break;
                 case 'integer':
                 case 'int':
                     if (filter_var($val, FILTER_VALIDATE_INT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non ï¿½ numerico.');
                     }
                     break;
             }
@@ -307,7 +296,5 @@ abstract class Model
     {
     }
     
-    abstract protected function init();
-    
-    
+    abstract protected function init();        
 }
