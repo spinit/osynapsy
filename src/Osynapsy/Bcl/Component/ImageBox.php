@@ -1,6 +1,7 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
+use Osynapsy\Helper\Image;
 use Osynapsy\Ocl\Component\Component;
 use Osynapsy\Ocl\Component\HiddenBox;
 use Osynapsy\Core\Lib\Tag;
@@ -15,16 +16,17 @@ class ImageBox extends Component
         'width' => null,
         'height' => null,
         'maxwidth' => 0,
-        'maxheight' => 0
+        'maxheight' => 0,
+        'domain' => ''
     );
     
     private $resizeMethod = 'resize';
     private $toolbar;
     private $dummy;
-    private $cropActive = false;
+    private $cropActive = false;    
     
     public function __construct($id)
-    {
+    {        
         $this->requireCss('/vendor/osynapsy/Bcl/ImageBox2/style.css');
         $this->requireCss('/vendor/osynapsy/Bcl/ImageBox2/cropper.css');
         $this->requireJs('/vendor/osynapsy/Bcl/ImageBox2/cropper.js');
@@ -46,19 +48,20 @@ class ImageBox extends Component
     {
         $this->getImage();
         $this->checkCrop();
-        $this->buildImage();
-       
+        $this->buildImageTag();
+        $this->toolbar->add(new Tag('a'))
+             ->att('href','javascript:void(0);')             
+             ->att('data-cmd','delete')
+             ->add('<buttun type="button" class="btn btn-danger cmd-execute pull-right" data-action="deleteImage" data-action-parameters="'.$this->image['webPath'].'"><span class="fa fa-trash"></span>');   
         if (empty($this->image['object'])) {
-            $this->dummy->add(new Tag('span'))->att('class', 'fa fa-camera glyphicon glyphicon-camera');
+            $this->dummy
+                 ->add(new Tag('span'))
+                 ->att('class', 'fa fa-camera glyphicon glyphicon-camera');
             if ($this->image['maxwidth']) {
                 $this->dummy->att('style','width : '.$this->image['maxwidth'].'px; height : '.$this->image['maxheight'].'px;');
             }
             return;
         }        
-        $this->toolbar->add(new Tag('a'))
-             ->att('href','javascript:void(0);')             
-             ->att('data-cmd','delete')
-             ->add('Elimina <span class="fa fa-trash cmd-execute" data-action="deleteImage" data-action-parameters="'.$this->image['webPath'].'"></span>');
         $this->add($this->toolbar);        
     }
     
@@ -80,15 +83,15 @@ class ImageBox extends Component
         $this->image['formFactor'] = $this->image['width'] / $this->image['height'];
     }
     
-    private function buildImage()
+    private function buildImageTag()
     {
         if (!file_exists($this->image['diskPath'])) { 
             return;
         }
         if ($this->cropActive) {
-            $this->image['object'] = $this->add(new Tag('img'))->att('src', $this->image['webPath']);
+            $this->image['object'] = $this->add(new Tag('img'))->att('src', $this->image['domain'].$this->image['webPath'])->att('class','imagebox-main');
         } else {
-            $this->image['object'] = $this->dummy->add(new Tag('img'))->att('src', $this->image['webPath']);
+            $this->image['object'] = $this->dummy->add(new Tag('img'))->att('src', $this->image['domain'].$this->image['webPath']);
         }
         $width = $this->image['width'];
         $height = $this->image['height'];
@@ -105,6 +108,9 @@ class ImageBox extends Component
     
     private function checkCrop()
     {    
+        if (empty($this->image['maxwidth'])){
+            return;
+        }
         if ($this->image['width'] <= $this->image['maxwidth'] && $this->image['height'] <= $this->image['maxheight']) {                        
             return;
         }
@@ -112,12 +118,19 @@ class ImageBox extends Component
         $this->att('data-max-width', $this->image['maxwidth']);
         $this->att('data-max-height', $this->image['maxheight']);
         $this->att('class','crop',true);
-        $this->toolbar->add('Crop <span class="fa fa-crop crop-command"></span>');    
+        $this->toolbar->add('<button type="button" class="crop-command btn btn-info btn-sm"><span class="fa fa-crop"></span></button> ');
+        $this->toolbar->add('<button type="button" class="zoomin-command btn btn-info btn-sm"><span class="fa fa-search-plus"></span></button> ');
+        $this->toolbar->add('<button type="button" class="zoomout-command btn btn-info btn-sm"><span class="fa fa-search-minus"></span></button> ');
     }        
     
     public function setAction($action)
     {
         $this->att('data-action', $action);
+    }
+    
+    public function setDomain($domain)
+    {
+        $this->image['domain'] = $domain;
     }
     
     public function setMaxDimension($width, $height)
@@ -136,44 +149,9 @@ class ImageBox extends Component
     
     public static function crop($path, $x, $y, $w, $h)
     {
-        $img = self::imageCreateFromAny($path);
-        $crp = imagecrop(
-            $img, 
-            array('x' => $x, 'y' => $y, 'width' => $w, 'height' =>$h)
-        );
-        imagepng($crp, $path);
+        $img = new Image($path);
+        $img->crop($x, $y, $w, $h);
+        $img->save($path);
         return true;
     }
-    
-    public static function imageCreateFromAny($filepath)
-    { 
-        $size = getImageSize($filepath); // [] if you don't have exif you could use getImageSize() 
-        $type = $size[2];
-        $allowedTypes = array( 
-            1,  // [] gif 
-            2,// [] jpg 
-            3,  // [] png 
-            6   // [] bmp 
-        ); 
-        if (!in_array($type, $allowedTypes)) { 
-            return false; 
-        } 
-        switch ($type) { 
-            case 1 : 
-                $img = imageCreateFromGif($filepath); 
-            break; 
-            case 2 : 
-                $img = imageCreateFromJpeg($filepath); 
-            break; 
-            case 3 : 
-                $img = imageCreateFromPng($filepath); 
-            break; 
-            case 6 : 
-                $img = imageCreateFromBmp($filepath); 
-            break; 
-        }    
-        return $img;  
-    }
 }
-
-
