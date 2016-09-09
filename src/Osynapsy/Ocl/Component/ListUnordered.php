@@ -21,6 +21,7 @@ class ListUnordered extends Component
     protected function __build_extra__()
     {
         foreach ($this->data as $rec) {
+            $rec = array_values($rec);
             $this->add(new Tag($this->itemTag))
                  ->att('data-value',$rec[0])
                  ->add($rec[1]);
