@@ -129,11 +129,11 @@ class DbOci
             }
         }
         
-        $ok = $this->__transaction ? @oci_execute($rs, OCI_NO_AUTO_COMMIT) : @oci_execute($rs);
+        $ok = $this->__transaction ? oci_execute($rs, OCI_NO_AUTO_COMMIT) : oci_execute($rs);
         
         if (!$ok) {
             $e = oci_error($rs);  // For oci_parse errors pass the connection handle
-            throw new \Exception($e['message']);
+            throw new \Exception($e['message'].PHP_EOL.$e['sqltext'].PHP_EOL.print_r($par,true));
             return;
         } 
         
@@ -150,9 +150,6 @@ class DbOci
 
     public function execQuery($sql, $par = null, $fetchMethod = null)
     {
-        if (!empty($this->__cur)) {
-            oci_free_statement($this->__cur);
-        }
         $this->__cur = $this->execCommand($sql, $par);
         switch ($fetchMethod) {
             case 'BOTH':
@@ -166,7 +163,7 @@ class DbOci
                 break;
         }
         oci_fetch_all($this->__cur, $result, null, null, OCI_FETCHSTATEMENT_BY_ROW|OCI_RETURN_NULLS|OCI_RETURN_LOBS|$fetchMethod);
-        //oci_free_statement($this->__cur);
+        //oci_free_statement($cur);
         return $result;
     }
 
