@@ -18,6 +18,7 @@ class Tags extends Component
         parent::__construct('div', $name);
         $this->hidden = $this->add(new HiddenBox($name));        
         $this->requireJs('/vendor/osynapsy/Bcl/Tags/script.js');
+        $this->requireCss('/vendor/osynapsy/Bcl/Tags/style.css');
         $this->labelClass = $class;
     }
     
@@ -32,7 +33,7 @@ class Tags extends Component
                 if (!$item) {
                     continue;
                 }
-                $this->add('<span class="label '.$this->labelClass.'">'.$item.' <span class="fa fa-close bclTags-delete"></span></span>&nbsp;');
+                $cont->add('<span class="label '.$this->labelClass.'" data-parent="#'.$this->id.'">'.$item.' <span class="fa fa-close bclTags-delete"></span></span>');
             }
         }
         
@@ -65,9 +66,9 @@ class Tags extends Component
         $this->modal->addFooter($buttonAdd);
     }
     
-    public function addDropDown($data)
+    public function addDropDown($label, $data)
     {
-        $this->dropdown = new Dropdown($this->id.'_list');
+        $this->dropdown = new Dropdown($this->id.'_list', $label, 'span');       
         $this->dropdown->setData($data);
     }
 }
