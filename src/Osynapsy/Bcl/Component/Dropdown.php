@@ -18,7 +18,7 @@ class Dropdown extends Component
              ->add(new Button($name.'_btn'))
              ->att('class','dropdown-toggle',true)
              ->att('data-toggle','dropdown')
-             ->add($label.'<span class="caret"></span>');
+             ->add($label.' <span class="caret"></span>');
         $this->list = $this->add(new ListUnordered($name.'-list','ul'));
         $this->list->att('class','dropdown-menu')->att('aria-labelledby',$this->id);
     }
