@@ -113,7 +113,7 @@ class Form extends Component
             $this->foot(new Button('btn_save'))
                  ->att('class','cmd-save btn btn-primary pull-right')
                  ->att('style','width: 100px; margin-right: 10px;')
-                 ->add('<span class="glyphicon glyphicon-floppy-disk"></span> Salva');
+                 ->add('<span class="glyphicon glyphicon-floppy-disk"></span> '.($save === true ? 'Salva' : $save));
         }
         
         if ($delete) {
