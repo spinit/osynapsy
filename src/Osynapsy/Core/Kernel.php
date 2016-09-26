@@ -43,7 +43,8 @@ class Kernel
             );
             $run = self::$appController->run();
         }
-        if ($run && $classController = self::$router->getRoute('controller')) {            
+        if ($run && $classController = self::$router->getRoute('controller')) {
+            file_put_contents('/var/tmp/cart.txt', $classController);
             self::$controller = new $classController(
                 self::$request,
                 self::$dba, 
