@@ -25,7 +25,7 @@ abstract class Controller implements InterfaceController
         $this->request = $request;
         $this->setDbHandler($db);
         $this->app = $appController;
-        $this->init();        
+        $this->init();
     }
     
     abstract public function indexAction();
