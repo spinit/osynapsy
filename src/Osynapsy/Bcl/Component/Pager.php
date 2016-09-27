@@ -259,4 +259,9 @@ class Pager extends Component
         $this->sql = $cmd;
         $this->par = $par;
     }
+    
+    public function getTotal($key)
+    {
+        return array_key_exists($key, $this->total) ? $this->total[$key] : null;
+    }
 }
