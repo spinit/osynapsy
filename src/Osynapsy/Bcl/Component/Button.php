@@ -12,4 +12,13 @@ class Button extends OclButton
         $this->att('type',$type)->att('class','btn');
     }
     
+    public function setAction($action, $parameters=null)
+    {
+        $this->att('class','cmd-execute',true)
+             ->att('data-action',$action);
+        if (!empty($parameters)) {
+            $this->att('data-action-parameters',$parameters);
+        }
+        return $this;
+    }    
 }
