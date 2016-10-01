@@ -48,7 +48,9 @@ class Form extends Component
         //Append foot
         if ($this->foot) {
             //$this->foot('<div style="clear : both;"></div>');
-            $this->body->put('',$this->foot->get(),10000,10,10,1);
+            //$this->body->put('',$this->foot->get(),10000,10,10,1);
+            $container->add('<br>');
+            $container->add($this->foot);
         }
     }
     
@@ -113,7 +115,7 @@ class Form extends Component
             $this->foot(new Button('btn_save'))
                  ->att('class','cmd-save btn btn-primary pull-right')
                  ->att('style','width: 100px; margin-right: 10px;')
-                 ->add('<span class="glyphicon glyphicon-floppy-disk"></span> '.($save === true ? 'Salva' : $save));
+                 ->add(($save === true ? '<span class="glyphicon glyphicon-floppy-disk"></span> Salva' : $save));
         }
         
         if ($delete) {
