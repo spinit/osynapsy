@@ -86,10 +86,13 @@ abstract class Controller implements InterfaceController
         return (is_array($this->parameters) && array_key_exists($key,$this->parameters)) ? $this->parameters[$key] : null;
     }
     
-    public function loadView($path, $params = array())
+    public function loadView($path, $params = array(), $return = false)
     {
-        $params = array('Db'=>$this->db, 'controller'=>$this);
+        $params = array('Db' => $this->db, 'controller' => $this);
         $view = $this->response->getBuffer($path, $params);
+        if ($return) {
+            return $view;
+        }
         $this->response->addContent($view);
     }
     
