@@ -48,9 +48,9 @@ class Form extends Component
         //Append foot
         if ($this->foot) {
             //$this->foot('<div style="clear : both;"></div>');
-            //$this->body->put('',$this->foot->get(),10000,10,10,1);
-            $container->add('<br>');
-            $container->add($this->foot);
+            $this->body->put('',$this->foot->get(),10000,10,10,1);
+            //$container->add('<br>');
+            //$container->add($this->foot);
         }
     }
     
