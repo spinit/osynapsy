@@ -31,8 +31,14 @@ class Image
         $this->info = [$width, $height, $type];
     }
     
-    public function crop($x, $y, $w, $h)
+    public function cropold($x, $y, $w, $h)
     {
+        $cw = imagesx($this->image);
+        $ch = imagesy($this->image);
+        if ($w > $cw && $h > $ch) {
+            return false;
+        }
+        
         $croppedImage = imagecrop(
             $this->image, 
             array(
@@ -44,6 +50,36 @@ class Image
         );        
         if ($croppedImage) {
             $this->image = $croppedImage;
+            return true;
+        }
+        return false;
+    }
+    
+    public function crop($x, $y, $cropW, $cropH, $bgcolor = [255,255,255])
+    {
+        $imageW = imagesx($this->image);
+        $imageH = imagesy($this->image);
+        $cropI  = imagecreatetruecolor($cropW , $cropH);
+        $color  = imagecolorallocate($cropI, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
+        imagefill($cropI, 0, 0, $color);// fill with white
+        $destX = $destY = 0;
+        if ($x < 0) {
+            $destX = abs($x);
+            $x = 0;
+        }
+        if ($y < 0) {
+            $destY = abs($y);
+            $y = 0;
+        }
+        if (($imageW + $destX) < $cropW) {
+            $cropW = $imageW;
+        }
+        if (($imageH + $destY) < $cropH) {
+            $cropH = $imageH;
+        }
+        //mail('pietro.celeste@gmail.com','crop',print_r(func_get_args(),true).' w:'.$imageW.' h:'.$imageH);
+        if (imagecopy($cropI, $this->image, $destX, $destY, $x, $y, $cropW, $cropH)) {
+            $this->image = $cropI;
             return true;
         }
         return false;
@@ -94,9 +130,13 @@ class Image
         imagecopy($this->image, $source, $x, $y, 0, 0, $sourceDim[0], $sourceDim[1]);                
     }
     
-    public function resize($newWidth, $newHeight)
+    public function resize($newWidth, $newHeight, $bgcolor = array(255, 255, 255))
     {        
         $resizedImage = imagecreatetruecolor(intval($newWidth), intval($newHeight));
+        if (!empty($bgcolor)) {
+            $col = imagecolorallocate($this->image, $bgcolor[0], $bgcolor[1], $bgcolor[2]);
+            imagefill($resizedImage, 0, 0, $col);
+        }
         imagecopyresampled(
             $resizedImage, 
             $this->image, 
