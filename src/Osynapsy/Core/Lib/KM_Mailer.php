@@ -177,7 +177,7 @@ class KM_Mailer
     public function send($from, $to, $subject, $message, $headers=null, $utf8=false)
     {
         /* set up the headers and message body with attachments if necessary */
-        $email  = "Date: " . date("D, j M Y G:i:s") . " -0500" . $this->newline;
+        $email  = "Date: " . date("D, j M Y G:i:s") . " +0200" . $this->newline;
         $email .= "From: $from" . $this->newline;
         $email .= "Reply-To: $from" . $this->newline;
         $email .= $this->setRecipients($to);
