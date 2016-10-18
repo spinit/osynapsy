@@ -132,15 +132,16 @@ abstract class Response
      */
     public static function cookie($vid, $vval, $sca = null)
     {        
-        $dom = $_SERVER['HTTP_HOST'];
+        $dom = filter_input(\INPUT_SERVER,'SERVER_NAME');        
         $app = explode('.',$dom);
         if (count($app) == 3){ 
             $dom = ".".$app[1].".".$app[2];            
-        }
+        }        
         if (empty($sca)) {
             $sca = mktime(0,0,0,date('m'),date('d'),date('Y')+1);
         }
         setcookie($vid, $vval, $sca, "/", $dom);
+        return $dom;
     }
     
     /**
