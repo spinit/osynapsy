@@ -1,5 +1,5 @@
 <?php
-
+namespace Osynapsy\Core\Helper\Geo;
 /**
  * staticMapLite 0.3.1
  *
@@ -25,7 +25,6 @@
  *
  */
 
-
 class StaticMap
 {
 
@@ -40,8 +39,8 @@ class StaticMap
     );
 
     protected $tileDefaultSrc = 'mapnik';
-    protected $markerBaseDir = 'images/markers';
-    protected $osmLogo = 'images/osm_logo.png';
+    protected $markerBaseDir = './upload/staticmap/markers';
+    protected $osmLogo = './upload/staticmap/osm_logo.png';
 
     protected $markerPrototypes = array(
         // found at http://www.mapito.net/map-marker-icons.html
@@ -76,18 +75,19 @@ class StaticMap
 
 
     protected $useTileCache = true;
-    protected $tileCacheBaseDir = '../cache/tiles';
+    protected $tileCacheBaseDir = './upload/cache/tiles';
 
     protected $useMapCache = true;
-    protected $mapCacheBaseDir = '../cache/maps';
+    protected $mapCacheBaseDir = './upload/cache/maps';
     protected $mapCacheID = '';
     protected $mapCacheFile = '';
     protected $mapCacheExtension = 'png';
 
     protected $zoom, $lat, $lon, $width, $height, $markers, $image, $maptype;
     protected $centerX, $centerY, $offsetX, $offsetY;
-
-    public function __construct()
+    protected $parameters;
+        
+    public function __construct($parameters=array())
     {
         $this->zoom = 0;
         $this->lat = 0;
@@ -96,41 +96,41 @@ class StaticMap
         $this->height = 350;
         $this->markers = array();
         $this->maptype = $this->tileDefaultSrc;
+        $this->parameters = $parameters;
     }
 
     public function parseParams()
     {
-        global $_GET;
-
-        if (!empty($_GET['show'])) {
+        if (!empty($this->parameters['show'])) {
            $this->parseOjwParams();
+           return;
         }
-        else {
-           $this->parseLiteParams();
-        }
+        $this->parseLiteParams();        
     }
 
     public function parseLiteParams()
     {
         // get zoom from GET paramter
-        $this->zoom = $_GET['zoom'] ? intval($_GET['zoom']) : 0;
-        if ($this->zoom > 18) $this->zoom = 18;
+        $this->zoom = $this->parameters['zoom'] ? intval($this->parameters['zoom']) : 0;
+        if ($this->zoom > 18) {
+            $this->zoom = 18;
+        }
 
         // get lat and lon from GET paramter
-        list($this->lat, $this->lon) = explode(',', $_GET['center']);
+        list($this->lat, $this->lon) = explode(',', $this->parameters['center']);
         $this->lat = floatval($this->lat);
         $this->lon = floatval($this->lon);
 
         // get size from GET paramter
-        if ($_GET['size']) {
-            list($this->width, $this->height) = explode('x', $_GET['size']);
+        if ($this->parameters['size']) {
+            list($this->width, $this->height) = explode('x', $this->parameters['size']);
             $this->width = intval($this->width);
             if ($this->width > $this->maxWidth) $this->width = $this->maxWidth;
             $this->height = intval($this->height);
             if ($this->height > $this->maxHeight) $this->height = $this->maxHeight;
         }
-        if (!empty($_GET['markers'])) {
-            $markers = explode('|', $_GET['markers']);
+        if (!empty($this->parameters['markers'])) {
+            $markers = explode('|', $this->parameters['markers']);
             foreach ($markers as $marker) {
                 list($markerLat, $markerLon, $markerType) = explode(',', $marker);
                 $markerLat = floatval($markerLat);
@@ -140,27 +140,26 @@ class StaticMap
             }
 
         }
-        if ($_GET['maptype']) {
-            if (array_key_exists($_GET['maptype'], $this->tileSrcUrl)) $this->maptype = $_GET['maptype'];
+        if ($this->parameters['maptype']) {
+            if (array_key_exists($this->parameters['maptype'], $this->tileSrcUrl)) $this->maptype = $this->parameters['maptype'];
         }
     }
 
     public function parseOjwParams()
     {
-        $this->lat = floatval($_GET['lat']);
-        $this->lon = floatval($_GET['lon']);
-        $this->zoom = intval($_GET['z']);
+        $this->lat = floatval($this->parameters['lat']);
+        $this->lon = floatval($this->parameters['lon']);
+        $this->zoom = intval($this->parameters['z']);
 
-        $this->width = intval($_GET['w']);
+        $this->width = intval($this->parameters['w']);
         if ($this->width > $this->maxWidth) $this->width = $this->maxWidth;
-        $this->height = intval($_GET['h']);
+        $this->height = intval($this->parameters['h']);
         if ($this->height > $this->maxHeight) $this->height = $this->maxHeight;
         
-
-	if (!empty($_GET['mlat0'])) {
-            $markerLat = floatval($_GET['mlat0']);
-            if (!empty($_GET['mlon0'])) {
-                $markerLon = floatval($_GET['mlon0']);
+        if (!empty($this->parameters['mlat0'])) {
+            $markerLat = floatval($this->parameters['mlat0']);
+            if (!empty($this->parameters['mlon0'])) {
+                $markerLon = floatval($this->parameters['mlon0']);
                 $this->markers[] = array('lat' => $markerLat, 'lon' => $markerLon, 'type' => "bullseye");
             }
         }
@@ -200,7 +199,7 @@ class StaticMap
 
         for ($x = $startX; $x <= $endX; $x++) {
             for ($y = $startY; $y <= $endY; $y++) {
-                $url = str_replace(array('{Z}', '{X}', '{Y}'), array($this->zoom, $x, $y), $this->tileSrcUrl[$this->maptype]);
+                $url = str_replace(array('{Z}', '{X}', '{Y}'), array($this->zoom, $x, $y), $this->tileSrcUrl[$this->maptype]);                
                 $tileData = $this->fetchTile($url);
                 if ($tileData) {
                     $tileImage = imagecreatefromstring($tileData);
@@ -244,7 +243,6 @@ class StaticMap
 
                 }
             }
-
             // check required files or set default
             if ($markerFilename == '' || !file_exists($this->markerBaseDir . '/' . $markerFilename)) {
                 $markerIndex++;
@@ -281,7 +279,6 @@ class StaticMap
 
         };
     }
-
 
     public function tileUrlToFilename($url)
     {
@@ -399,9 +396,4 @@ class StaticMap
 
         }
     }
-
 }
-
-//$map = new staticMapLite();
-//print $map->showMap();
-
