@@ -20,4 +20,9 @@ class CheckBox extends Component
             $this->checkbox->att('checked','checked');
         }
     }
+    
+    public function getCheckbox()
+    {
+        return $this->checkbox;
+    }
 }
