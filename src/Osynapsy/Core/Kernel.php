@@ -31,30 +31,40 @@ class Kernel
         self::$router = new Router();
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');
         self::$request = self::$router->getRequest();
-        
-        $app = self::$router->getRoute('application');                   
-        $run = true;
-        //If app has applicationController instance it before recall route controller;
-        if (!empty($app) && !empty(self::$repo['xmlconfig'][$app]['controller'])) {
-            $classControllerApp = str_replace(':','\\',self::$repo['xmlconfig'][$app]['controller']);
-            self::$appController = new $classControllerApp(
-                Kernel::$dba,
-                self::$router->getRoute()
-            );
-            $run = self::$appController->run();
+        if (self::runAppController()) {
+            $response = self::runRouteController(self::$router->getRoute('controller'));
+            if ($response !== false) {
+                return $response;
+            }
         }
-        if ($run && $classController = self::$router->getRoute('controller')) {
-            file_put_contents('/var/tmp/cart.txt', $classController);
-            self::$controller = new $classController(
-                self::$request,
-                self::$dba, 
-                self::$appController
-            );
-            return (string) self::$controller->getResponse();
-        }
+
         return self::pageNotFound();
     }
-
+    
+    private static function runAppController()
+    {
+        $app = self::$router->getRoute('application');
+        if (empty($app)) {
+            return true;
+        }        
+        if (empty(self::$repo['xmlconfig'][$app]['controller'])) {
+            return true;
+        }
+        //If app has applicationController instance it before recall route controller;
+        $classControllerApp = str_replace(':','\\',self::$repo['xmlconfig'][$app]['controller']);
+        self::$appController = new $classControllerApp(Kernel::$dba, self::$router->getRoute());
+        return self::$appController->run();
+    }
+    
+    private static function runRouteController($classController)
+    {
+        if (empty($classController)) {
+            return false;
+        }
+        self::$controller = new $classController(self::$request, self::$dba, self::$appController);
+        return (string) self::$controller->getResponse();
+    }
+    
     private static function loadConfiguration($path)
     {
         if (!is_file($path)) {
