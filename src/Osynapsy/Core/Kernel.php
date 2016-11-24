@@ -51,8 +51,8 @@ class Kernel
                 self::$appController
             );
             return (string) self::$controller->getResponse();
-        } 
-        return "Page not found";        
+        }
+        return self::pageNotFound();
     }
 
     private static function loadConfiguration($path)
@@ -151,5 +151,12 @@ class Kernel
           $head .= "Content-Transfer-Encoding: 7bit\n\n";
         }
         return mail($a,$subject,$body,$head," -f ".$from);
+    }
+    
+    public static function pageNotFound($message = 'Page not found')
+    {
+        ob_clean();
+        header('HTTP/1.1 404 Not Found');
+        return $message;
     }
 }
