@@ -15,6 +15,7 @@ class Pager extends Component
     protected $data = array();
     private $db;
     private $filters = array();
+    private $fields = array();
     private $loaded = false;
     private $par;
     private $sql;  
@@ -38,6 +39,9 @@ class Pager extends Component
         if ($dim) {
             $this->page['dimension'] = $dim;
         }
+        if ($id) {
+            $this->addField($id);
+        }
     }
     
     public function __build_extra__()
@@ -45,7 +49,9 @@ class Pager extends Component
         if (!$loaded) {
             $this->loadData;
         }
-        $this->add(new HiddenBox($this->id));
+        foreach($this->fields as $fieldId) { 
+            $this->add(new HiddenBox($fieldId));
+        }        
         $ul = $this->add(new Tag('ul'));
         $ul->att('class','pagination');
         $liFirst = $ul->add(new Tag('li'));
@@ -80,6 +86,11 @@ class Pager extends Component
                ->att('href','#')
                ->att('data-value','last')
                ->add('&raquo;');
+    }
+    
+    public function addField($field)
+    {
+        $this->fields[] = $field;
     }
     
     public function addFilter($field, $value = null)
