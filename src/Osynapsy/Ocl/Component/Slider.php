@@ -1,3 +1,4 @@
+<?php 
 class oslider extends component {
 
 	private $bar;
