@@ -23,7 +23,11 @@ class ImageBox extends Component
     private $resizeMethod = 'resize';
     private $toolbar;
     private $dummy;
-    private $cropActive = false;    
+    private $cropActive = false;
+    private $action = array(
+        'crop' => 'crop',
+        'delete' => 'deleteImage'
+    );
     
     public function __construct($id)
     {        
@@ -89,7 +93,10 @@ class ImageBox extends Component
             return;
         }
         if ($this->cropActive) {
-            $this->image['object'] = $this->add(new Tag('img'))->att('src', $this->image['domain'].$this->image['webPath'])->att('class','imagebox-main');
+            $this->image['object'] = $this->add(new Tag('img'))
+                                          ->att('src', $this->image['domain'].$this->image['webPath'])
+                                          ->att('class','imagebox-main')
+                                          ->att('data-action',$this->action['crop']);
         } else {
             $this->image['object'] = $this->dummy->add(new Tag('img'))->att('src', $this->image['domain'].$this->image['webPath']);
         }
@@ -153,5 +160,10 @@ class ImageBox extends Component
         $img->crop($x, $y, $w, $h);
         $img->save($path);
         return true;
+    }
+    
+    public function setCropAction($action)
+    {
+        $this->action['crop'] = $action;
     }
 }
