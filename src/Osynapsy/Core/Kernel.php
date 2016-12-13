@@ -148,13 +148,12 @@ class Kernel
         return $target;
     }
 
-    public static function sendEmail($from,$a,$subject,$body,$html=false)
+    public static function sendEmail($from, $a, $subject, $body, $html=false)
     {
         $head = "From: $from\r\n".
                 "Reply-To: $from\r\n".
                 "X-Mailer: PHP/".phpversion()."\n";
-        if ($html)
-        {
+        if ($html) {
           $head .= "MIME-Version: 1.0\n";
           $head .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
           $head .= "Content-Transfer-Encoding: 7bit\n\n";
