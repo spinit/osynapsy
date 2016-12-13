@@ -37,7 +37,6 @@ class Kernel
                 return $response;
             }
         }
-
         return self::pageNotFound();
     }
     
@@ -62,7 +61,7 @@ class Kernel
             return false;
         }
         self::$controller = new $classController(self::$request, self::$dba, self::$appController);
-        return (string) self::$controller->getResponse();
+        return (string) self::$controller->run();
     }
     
     private static function loadConfiguration($path)
