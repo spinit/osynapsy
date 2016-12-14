@@ -14,7 +14,7 @@ class Router
         '?I' => '([\\d]*){1}',
         '?.' => '([.]+){1}',
         '?w' => '([\\w-,]+){1}', 
-        /*'?'  => '(.*){1}', */
+        '?*'  => '(.*){1}',
         '?' => '([^\/]*)',
         '/'  => '\\/'        
     );
@@ -36,16 +36,12 @@ class Router
                 $url = (string) $e['path'];
                 $ctl = (string) trim(str_replace(':', '\\', $e[0]));
                 $tpl = (string) $e['template'];
-                $this->routes->addRoute($id, $url, $ctl, $tpl);
-                $this->isCurrentRoute($url, $ctl, $tpl, $appName, $e->attributes());
+                $this->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
             }
         }
         if ($this->debug) {
             var_dump($this->routes);
-        }
-        if ($this->routes->get('current')) {
-            $this->request->set('page', $this->routes->get('current'));
-        }
+        }        
     }
     
     private function isCurrentRoute($url, $ctl, $tpl, $app, $attr=null)
@@ -73,6 +69,7 @@ class Router
             $url
         );
         preg_match('|^'.$pattern.'$|', $this->request->get('query.q'), $out);
+        
         if (empty($out)){
             return;
         }  
@@ -82,11 +79,19 @@ class Router
         $this->routes->set('current.application', $app);
         $this->routes->set('current.parameters', $out);
         $this->routes->set('current.attributes', $attr);
+        $this->request->set('page', $this->routes->get('current'));
     }
     
     public function get($key)
     {
         return $this->routes->get($key);
+    }
+    
+    public function addRoute($id, $url, $controller, $templateId, $application, $attributes=array())
+    {    
+        $this->routes->addRoute($id, $url, $controller, $templateId);
+        $this->isCurrentRoute($url, $controller, $templateId, $application, $attributes);
+        
     }
     
     public function getRoute($key='')
