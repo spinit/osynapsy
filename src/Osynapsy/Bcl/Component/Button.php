@@ -8,7 +8,7 @@ class Button extends OclButton
     
     public function __construct($id, $type = 'button')
     {
-        parent::__construct($id);
+        parent::__construct($id);        
         $this->att('type',$type)->att('class','btn');
     }
     

@@ -1,0 +1,80 @@
+.osy-datagrid-2 table.border-on{
+    border-bottom: 1px solid #f8f8f8;
+}
+.osy-datagrid-2 table.border-on th {
+    text-align: center;
+    border: 0px;
+}
+.osy-datagrid-2 table.border-on th,
+.osy-datagrid-2 table.border-on td {
+    padding: 2px 3px !important;
+}
+.osy-datagrid-2 input[type="text"] {
+    padding: 1px 2px !important;
+    line-height: 1.1em;
+}
+.osy-datagrid-2 table.border-off th {
+    border-bottom: 1px solid silver !important; 
+    border-right: 0px !important;
+}
+.osy-datagrid-2 table.border-off th,
+.osy-datagrid-2 table.border-off td {
+    border-right: 0px !important;
+}
+
+.osy-datagrid-2 .osy-datagrid-2-toolbar {
+    padding-bottom: 15px;
+    min-height: 40px;
+}
+.osy-datagrid-2 .form-group {
+    margin-left: 20px;
+    display: inline-block;
+}
+.osy-datagrid-2 .osy-datagrid-2-toolbar select {
+    width: auto !important; 
+    margin-right: 10px;
+}
+
+.osy-datagrid-2 table th {
+    background-color: #F7F7F7; 
+    text-align: left;
+    font-weight: bold;     
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.osy-datagrid-2 table th:hover {
+    color: blue;
+}
+
+.osy-datagrid-2 table tr:hover td {
+    background-color: #f8f8f8;
+}
+
+.osy-datagrid-2 table th .orderIcon {
+    font-weight: normal;
+}
+
+.osy-datagrid-2 table th span {
+    font-size: 12px; 
+    line-height: 30px; 
+    font-weight: bold;
+}
+
+.osy-datagrid-2 table {
+    border-top: 0px;
+    border-bottom: 1px solid #CCC !important;
+}
+
+.osy-datagrid-2 table td {
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.osy-datagrid-2 .osy-datagrid-2-foot {
+    padding: 10px 0px;
+}
+
+.osy-datagrid-2 .osy-datagrid-2-foot button {
+  margin: 0px 2px;
+}

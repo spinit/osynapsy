@@ -44,8 +44,8 @@ class DataGrid extends Component
 
     public function __construct($name, $toolbar=true, $db=null)
     {
-        $this->requireJs('/vendor/osynapsy/Ocl/DataGrid/script.js');
-        $this->requireCss('/vendor/osynapsy/Ocl/DataGrid/style.css');
+        $this->requireJs('/__OsynapsyAsset/Ocl/DataGrid/script.js');
+        $this->requireCss('/__OsynapsyAsset/Ocl/DataGrid/style.css');
         parent::__construct('div',$name);
         $this->db = empty($db) ? Kernel::$dba : $db;
         $this->att('class','osy-datagrid-2');
@@ -465,7 +465,7 @@ class DataGrid extends Component
                     @list($opt['cell']['format'],$opt['cell']['title'],$opt['cell']['parameter']) = explode(',',$opt['cell']['rawtitle']);
                     break;
                 case '$':
-                case '€':
+                case 'ï¿½':
                     $opt['cell']['format'] = 'money';
                     //$opt['cell']['class'] = array('right');
                     break;
@@ -485,7 +485,7 @@ class DataGrid extends Component
             if (!empty($opt['row']['style'])){
                 $orw->att('style',implode(' ',$opt['row']['style']));
             }
-            //Non stampo la colonna se in $opt['cell']['print'] è contenuto false
+            //Non stampo la colonna se in $opt['cell']['print'] ï¿½ contenuto false
             if (!$opt['cell']['print']) {
                 continue;
             }
