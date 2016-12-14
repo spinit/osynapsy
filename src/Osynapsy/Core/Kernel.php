@@ -28,9 +28,10 @@ class Kernel
         self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');
         self::loadDatasources();
         self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');
-        self::$router = new Router();
+        self::$router = new Router();        
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');
         self::$request = self::$router->getRequest();
+        self::$router->addRoute('OsynapsyAssetsManager','/__OsynapsyAsset/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
         if (self::runAppController()) {
             $response = self::runRouteController(self::$router->getRoute('controller'));
             if ($response !== false) {
