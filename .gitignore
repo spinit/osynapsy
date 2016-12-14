@@ -1,3 +1,7 @@
 /nbproject/private/
 /nbproject/project.xml
 /nbproject/project.properties
+vendor
+web
+composer.lock
+build
