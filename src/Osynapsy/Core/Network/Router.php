@@ -55,6 +55,7 @@ class Router
                 $this->routes->set('current.application', $app);
                 $this->routes->set('current.parameters', $out);
                 $this->routes->set('current.attributes', $attr);
+                $this->request->set('page', $this->routes->get('current'));
            }
            return;
         }
