@@ -17,8 +17,8 @@ class Tags extends Component
     {
         parent::__construct('div', $name);
         $this->hidden = $this->add(new HiddenBox($name));        
-        $this->requireJs('/vendor/osynapsy/Bcl/Tags/script.js');
-        $this->requireCss('/vendor/osynapsy/Bcl/Tags/style.css');
+        $this->requireJs('/__OsynapsyAsset/Bcl/Tags/script.js');
+        $this->requireCss('/__OsynapsyAsset/Bcl/Tags/style.css');
         $this->labelClass = $class;
     }
     
