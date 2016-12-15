@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="false" 
+         bootstrap="../autoload.php"
+         verbose="true"
+         timeoutForSmallTests="10">
+    <logging>
+        <log type="coverage-clover" target="clover.xml"/>
+    </logging>
+    <testsuites>
+        <testsuite name="osynapsy">
+            <directory suffix="Test.php">../tests</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>
+

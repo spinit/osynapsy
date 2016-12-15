@@ -6,6 +6,9 @@ use Osynapsy\Core\Network\Router;
 use Osynapsy\Core\Driver\DbPdo;
 use Osynapsy\Core\Driver\DbOci;
 
+/**
+ * Inizializzazione del sistema
+ */
 class Kernel
 {
     private static $repo = array(

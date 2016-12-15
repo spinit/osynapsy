@@ -120,7 +120,7 @@ class Dictionary implements \ArrayAccess, \Iterator, \Countable
         unset($this->repo[$offset]);
     }
 
-    public function &offsetGet($offset) 
+    public function offsetGet($offset) 
     {
         $null = null;
         return isset($this->repo[$offset]) ? $this->get($offset) : $null;
