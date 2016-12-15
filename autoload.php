@@ -1,7 +1,10 @@
 <?php
 ob_start();
-
-include('vendor/autoload.php');
+if (is_file('vendor/autoload.php')) {
+    include('vendor/autoload.php');
+} else {
+    include('src/Osynapsy/autoload.php');
+}
 
 function array_get($array, $field, $default = '')
 {
