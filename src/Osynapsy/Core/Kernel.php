@@ -25,9 +25,8 @@ class Kernel
     {
         self::set('query',is_null($query) ? '/' :  $query);
         self::loadConfiguration($fileconf);
-        self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');
-        self::loadDatasources();
-        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');
+        self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
+        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');       
         self::$router = new Router();        
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');
         self::$request = self::$router->getRequest();
@@ -43,10 +42,12 @@ class Kernel
     
     private static function runAppController()
     {
-        $app = self::$router->getRoute('application');
+        $app = self::$router->getRoute('application');        
         if (empty($app)) {
             return true;
-        }        
+        }
+        self::loadDatasources("/configuration/app/$app/datasources/db");
+        
         if (empty(self::$repo['xmlconfig'][$app]['controller'])) {
             return true;
         }
@@ -82,31 +83,33 @@ class Kernel
         }
     }
 
-    private static function loadDatasources()
+    private static function loadDatasources($path = '/configuration/datasources/db')
     {
-        foreach (self::$repo['xmlconfig'] as $xml) {
-            $nConn = 0;
-            foreach ($xml->xpath('/configuration/datasources/db') as $e) {
-                $par = (array) $e->attributes(); //['@attributes'];
+        foreach (self::$repo['xmlconfig'] as $xml) {            
+            foreach ($xml->xpath($path) as $e) {                 
+                $par = (array) $e->attributes(); //['@attributes'];             
                 $connectionStr = (string) $e[0];
                 $connectionSha = sha1($connectionStr);
                 if (array_key_exists($connectionSha, self::$db)) {
                     continue;
                 }
-                if (strpos($connectionStr,'oracle') !== false) {
-                    self::$db[$connectionSha] = new DbOci($connectionStr);
-                } else {
-                    self::$db[$connectionSha] = new DbPdo($connectionStr);
-                }               
+                self::$db[$connectionSha] = self::getDbConnection($connectionStr);               
                 self::$db[$connectionSha]->connect();
-                if ($nConn === 0) {
+                if (empty(self::$dba)) {
                     self::$dba = self::$db[$connectionSha];
                 }
-                $nConn++;
             }
         }
     }
 
+    private static function getDbConnection($connectionString)
+    {        
+        if (strpos($connectionString, 'oracle') !== false) {
+            return new DbOci($connectionString);
+        } 
+        return new DbPdo($connectionString);
+    }
+    
     public static function loadXmlConfig($xpath, $dest, $kkey, $kval)
     {
         foreach (self::$repo['xmlconfig'] as $xml) {
