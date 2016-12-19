@@ -3,7 +3,14 @@ language: php
 
 php : '5.6'
 
-script: phpunit -c build/phpunit.xml --coverage-clover=coverage.xml tests/
+before_script:
+    - npm install --silent -g zombie > /dev/null
+    - export NODE_PATH=`find /home/travis/.nvm -maxdepth 3 -name node_modules -type d`
+    - composer install
+    - php -d always_populate_raw_post_data=-1 -S localhost:8000 -t demo >/dev/null 2>&1 &
+
+script: 
+    - phpunit -c build/phpunit.xml tests/
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

@@ -1,0 +1,21 @@
+
+default:
+    context:
+        class: FeatureContext
+        parameters:     
+            # URL to use against the web server in the features
+            url: http://localhost:8000/
+
+            # Path to the document root
+            documentRoot: demo
+
+            # How many seconds will we allow the httpd to use when starting?
+            timeout: 1
+            
+    extensions:
+        Behat\MinkExtension\Extension:
+            base_url: http://localhost:8000/
+            default_session: zombie
+            javascript_session: zombie
+            zombie: ~
+#              node_modules_path: '/home/ermanno/lib/node_modules/'

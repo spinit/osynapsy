@@ -7,6 +7,6 @@ use Osynapsy\Base;
 ?>
 <html>
     <body>
-        <input id="text"/>
+        <input id="test"/>
     </body>
 </html>

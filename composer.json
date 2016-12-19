@@ -1,5 +1,5 @@
 {
-    "name": "osynapsy.org/osynapsy",
+    "name": "spinit/osynapsy",
     "version": "0.1.4.1",
     "homepage": "http://www.osynapsy.org/",
     "type": "library",
@@ -14,7 +14,11 @@
         }
     ],
     "require": {
-        "php": ">=5.4.3"
+        "php": ">=5.4.3",
+        "behat/behat": "2.5.*@stable",
+        "behat/mink": "1.5@stable",
+        "behat/mink-extension": "*",
+        "behat/mink-zombie-driver": "*@dev"
     },
     "autoload" : {
         "psr-4": {
