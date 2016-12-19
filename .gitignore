@@ -3,3 +3,4 @@
 /nbproject/project.properties
 vendor
 composer.lock
+build/logs

@@ -1,16 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit backupGlobals="false" 
-         bootstrap="../autoload.php"
+         bootstrap="../tests/bootstrap.php"
          verbose="true"
          timeoutForSmallTests="10">
     <logging>
-        <log type="coverage-clover" target="clover.xml"/>
+        <log type="coverage-html" target="logs/coverage-html"/>
+        <log type="coverage-clover" target="logs/clover.xml"/>
+        <log type="coverage-crap4j" target="logs/crap4j.xml"/>
+        <log type="coverage-xml" target="logs/coverage-xml"/>
+        <log type="coverage-clover" target="logs/clover.xml"/>
     </logging>
     <testsuites>
         <testsuite name="osynapsy">
             <directory suffix="Test.php">../tests</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory>../src</directory>
+        </whitelist>
+    </filter>
 </phpunit>
 
