@@ -20,6 +20,10 @@
         "behat/mink-extension": "*",
         "behat/mink-zombie-driver": "*@dev"
     },
+    "minimum-stability": "dev",
+    "config": {
+        "bin-dir": "bin/"
+    },
     "autoload" : {
         "psr-4": {
             "Osynapsy\\": "src/Osynapsy/"
