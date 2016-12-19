@@ -1,7 +1,12 @@
 <?php
 include('../autoload.php');
 
-use Osynapsy\Singleton;
+use Osynapsy\Base;
 
-$kernel = Singleton::kernel();
-var_dump($kernel);
+
+?>
+<html>
+    <body>
+        <input id="text"/>
+    </body>
+</html>
