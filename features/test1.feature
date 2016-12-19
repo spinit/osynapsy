@@ -6,4 +6,4 @@ Feature: Test di prova
         When print last response
         And I fill in "test" with "test"
         Then print current URL
-        And the "test" field should contain "test"
+        And field "test" has value "test"
