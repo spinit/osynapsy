@@ -8,7 +8,7 @@
     "license": "LGPLv3",
     "authors": [
         {
-            "name": "Pietro Celeste2",
+            "name": "Pietro Celeste",
             "email": "p.celeste@opensymap.org",
             "homepage": "http://https://github.com/opensymap/osy/wiki"
         }
@@ -18,11 +18,7 @@
         "behat/behat": "2.5.*@stable",
         "behat/mink": "1.5@stable",
         "behat/mink-extension": "*",
-        "behat/mink-zombie-driver": "*@dev"
-    },
-    "minimum-stability": "dev",
-    "config": {
-        "bin-dir": "bin/"
+        "behat/mink-zombie-driver": "*"
     },
     "autoload" : {
         "psr-4": {
