@@ -10,6 +10,7 @@ before_script:
     - php -d always_populate_raw_post_data=-1 -S localhost:8000 -t demo >/dev/null 2>&1 &
 
 script: 
+    - ./bin/behat
     - phpunit -c build/phpunit.xml tests/
 
 after_success:
