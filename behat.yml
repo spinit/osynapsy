@@ -1,21 +1,31 @@
-
+# behat.yml
 default:
     context:
+        class:  'FeatureContext'
+    extensions:
+        Behat\MinkExtension\Extension:
+            base_url: http://127.0.0.1:8000/
+            default_session: selenium2
+            browser_name: 'firefox'
+            selenium2:                    
+                capabilities: { "browser": "firefox", "version": "14"}
+    
+phantomjs:
+    context:
+        class:  'FeatureContext'
+    extensions:
+        Behat\MinkExtension\Extension:
+            base_url: 'http://127.0.0.1:8000'
+            # goutte: ~
+            selenium2:
+                wd_host: "http://127.0.0.1:8001/wd/hub"
+                
+zombie:
+    context:
         class: FeatureContext
-        parameters:     
-            # URL to use against the web server in the features
-            url: http://127.0.0.1:8000/
-
-            # Path to the document root
-            documentRoot: demo
-
-            # How many seconds will we allow the httpd to use when starting?
-            timeout: 1
-            
     extensions:
         Behat\MinkExtension\Extension:
             base_url: http://127.0.0.1:8000/
             default_session: zombie
             javascript_session: zombie
-            zombie: ~
-#              node_modules_path: '/home/ermanno/lib/node_modules/'
+            zombie: ~modules/'
