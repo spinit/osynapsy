@@ -7,6 +7,8 @@ use Osynapsy\Base;
 ?>
 <html>
     <body>
-        <input id="test"/>
+        <form>
+            <input id="test"/>
+        </form>
     </body>
 </html>

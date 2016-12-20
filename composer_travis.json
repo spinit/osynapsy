@@ -24,6 +24,9 @@
         "behat/mink-extension": "*",
         "behat/mink-selenium2-driver": "*"
     },
+    "config": {
+        "bin-dir": "bin/"
+    },
     "autoload" : {
         "psr-4": {
             "Osynapsy\\": "src/Osynapsy/"

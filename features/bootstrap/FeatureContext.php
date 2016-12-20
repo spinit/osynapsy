@@ -13,7 +13,7 @@ class FeatureContext extends Behat\MinkExtension\Context\MinkContext
      */
     public function fieldHasValue($field, $value)
     {
-        $value_form = $this->getSession->evaluateScript("return form['{$field}'].value");
+        $value_form = $this->getSession()->evaluateScript("return form['{$field}'].value");
         if ($value_form != $value) {
             throw new Exception("Valori diversi : [[$value_form}] [{$value}]");
         }
