@@ -1,12 +1,13 @@
 <?php
 namespace Osynapsy\Core\Network;
 
-use Osynapsy\Core\Request\Request as Request;
+use Osynapsy\Core\Request\Request;
 
 class Router
 {
     public $request;
     private $routes;
+    private $requestRoute;
     private $debug=false;
     //Rispettare l'ordine
     private $patternPlaceholder = array(
@@ -19,13 +20,11 @@ class Router
         '/'  => '\\/'        
     );
     
-    public function __construct()
+    public function __construct($requestRoute, Request &$request)
     {
-        $this->routes = new RouteCollection();
-        if (empty($_GET['q'])) { //Workaround
-            $_GET['q'] = '/';
-        }
-        $this->request = new Request( $_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $this->requestRoute = empty($requestRoute) ? '/' : $requestRoute;
+        $this->request = $request;
+        $this->routes = new RouteCollection();        
     }
     
     public function loadXml($xmlDocs, $path)
@@ -48,7 +47,7 @@ class Router
     {
         $nParams = substr_count($url, '?'); 
         if ($nParams === 0) {
-           if ($url === $this->request->get('query.q')) {
+           if ($url === $this->requestRoute) {
                 $this->routes->set('current.url', $url);
                 $this->routes->set('current.controller', $ctl); 
                 $this->routes->set('current.templateId', $tpl);
@@ -69,7 +68,7 @@ class Router
             ),
             $url
         );
-        preg_match('|^'.$pattern.'$|', $this->request->get('query.q'), $out);
+        preg_match('|^'.$pattern.'$|', $this->requestRoute, $out);
         
         if (empty($out)){
             return;
