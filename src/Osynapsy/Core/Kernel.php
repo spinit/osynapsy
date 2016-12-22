@@ -85,8 +85,7 @@ class Kernel
     private static function loadDatasources($path = '/configuration/datasources/db')
     {
         foreach (self::$repo['xmlconfig'] as $xml) {            
-            foreach ($xml->xpath($path) as $e) {                 
-                $par = (array) $e->attributes(); //['@attributes'];             
+            foreach ($xml->xpath($path) as $e) {                     
                 $connectionStr = (string) $e[0];
                 $connectionSha = sha1($connectionStr);
                 if (array_key_exists($connectionSha, self::$db)) {
