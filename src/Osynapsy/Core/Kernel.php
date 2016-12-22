@@ -3,6 +3,7 @@ namespace Osynapsy\Core;
 
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Network\Router;
+use Osynapsy\Core\Request\Request;
 use Osynapsy\Core\Driver\DbPdo;
 use Osynapsy\Core\Driver\DbOci;
 
@@ -11,8 +12,7 @@ class Kernel
     private static $repo = array(
         'xmlconfig' => array(),
         'events' => array(), 
-        'layouts' => array(),
-        'query' => null
+        'layouts' => array()        
     );
     public static $router;
     public static $request;
@@ -21,15 +21,14 @@ class Kernel
     public static $db = array();
     public static $dba = array();
 
-    public static function init($fileconf, $query)
-    {
-        self::set('query',is_null($query) ? '/' :  $query);
+    public static function init($fileconf, $requestRoute)
+    {        
         self::loadConfiguration($fileconf);
         self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
-        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');       
-        self::$router = new Router();        
-        self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');
-        self::$request = self::$router->getRequest();
+        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
+        self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        self::$router = new Router($requestRoute, self::$request);
+        self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
         self::$router->addRoute('OsynapsyAssetsManager','/__OsynapsyAsset/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
         if (self::runAppController()) {
             $response = self::runRouteController(self::$router->getRoute('controller'));
