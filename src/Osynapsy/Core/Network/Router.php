@@ -31,7 +31,7 @@ class Router
     {
         foreach ($xmlDocs as $appName => $xml) {
             foreach ($xml->xpath($path) as $e) {
-                $rid = (string) $e['id'];
+                $id = (string) $e['id'];
                 $url = (string) $e['path'];
                 $ctl = (string) trim(str_replace(':', '\\', $e[0]));
                 $tpl = (string) $e['template'];
