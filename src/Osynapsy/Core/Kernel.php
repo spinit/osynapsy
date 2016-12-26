@@ -9,7 +9,7 @@ use Osynapsy\Core\Driver\DbOci;
 /**
  * Inizializzazione del sistema
  */
-class Kernel
+class Kernel extends Base
 {
     private $repo = array(
         'xmlconfig' => array(),
@@ -162,13 +162,13 @@ class Kernel
           $head .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
           $head .= "Content-Transfer-Encoding: 7bit\n\n";
         }
-        return mail($a,$subject,$body,$head," -f ".$from);
+        return $this->env()->mail($a,$subject,$body,$head," -f ".$from);
     }
     
     public  function pageNotFound($message = 'Page not found')
     {
-        ob_clean();
-        header('HTTP/1.1 404 Not Found');
+        $this->env()->ob_clean();
+        $this->env()->header('HTTP/1.1 404 Not Found');
         return $message;
     }
 }
