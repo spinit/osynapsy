@@ -1,4 +1,9 @@
-class tab extends component
+<?php
+namespace Osynapsy\Ocl\Component;
+
+use Osynapsy\Core\Lib\Tag;
+
+class Tab extends Component
 {
     private $__head = null;
     private $__body = null;
@@ -6,24 +11,22 @@ class tab extends component
     
     public function __construct($name)
     {
-        parent::__construct('div',$name);
-        $this->att('class','tabs');
-        $this->add(new hidden_box($name))->att('class','req-reinit');
+        parent::__construct('div', $name);
+        $this->att('class', 'tabs');
+        $this->add(new HiddenBox($name))
+             ->att('class','req-reinit');
         //osy_form::$page->add_script('../lib/jquery/jquery.scrollabletab.js');
     }
     
     protected function __build_extra__()
     {
-        $head = $this->add(tag::create('ul'));
+        $head = $this->add(new Tag('ul'));
         ksort($this->__tabs);
         $it = 0;
-        foreach($this->__tabs as $row)
-        {
+        foreach($this->__tabs as $row) {
             ksort($row);
-            foreach($row as $cols)
-            {
-                foreach($cols as $obj)
-                {
+            foreach($row as $cols) {
+                foreach($cols as $obj) {
                     $prefix = is_object($obj['obj']) ? $obj['obj']->get_par('label-prefix').' ' : '';
 					$head->add('<li><a href="#'.$this->id.'_'.$it.'" idx="'.$it.'"><p><span>'.$prefix.$obj['lbl']."</span></p></a></li>\n");
                     $div = $this->add(tag::create('div'))->att('id',$this->id.'_'.$it);
@@ -45,14 +48,15 @@ class tab extends component
         $this->__tabs[$r][$c][] = array('lbl'=>$lbl,'obj'=>$obj);
     }
     
-    public function build_pdf($pdf,$xwidth,$xstart){
-		foreach($this->__tabs as $row){
+    public function build_pdf($pdf,$xwidth,$xstart)
+    {
+		foreach ($this->__tabs as $row) {
 			ksort($row);
-			foreach($row as $cols){
+			foreach ($row as $cols) {
 				$cury = $pdf->getY();
 				ksort($cols);
-				foreach($cols as $obj){
-					if (!empty($obj['obj']) && is_object($obj['obj'])){
+				foreach ($cols as $obj) {
+					if (!empty($obj['obj']) && is_object($obj['obj'])) {
 						$pdf->setFont('helvetica','B',10);
 						if (is_object($obj['obj']) && method_exists($obj['obj'],'build_pdf')){
 							$pdf->SetFillColor(230,230,230);
