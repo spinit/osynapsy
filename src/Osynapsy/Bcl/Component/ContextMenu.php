@@ -3,8 +3,6 @@ namespace Osynapsy\Bcl\Component;
 
 use Osynapsy\Core\Lib\Tag;
 use Osynapsy\Ocl\Component\Component;
-use Osynapsy\Ocl\Component\HiddenBox;
-use Osynapsy\Core\Kernel;
 
 class ContextMenu extends Component
 {
