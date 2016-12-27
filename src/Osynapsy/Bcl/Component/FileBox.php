@@ -22,7 +22,7 @@ class FileBox extends Component
                 </span>
             </span>
         */
-        $this->requireJs('/__OsynapsyAsset/Bcl/FileBox/script.js');
+        $this->requireJs('/__asset/osynapsy/Bcl/FileBox/script.js');
         
         parent::__construct('dummy',$name);
         $this->span = $this->add(new Tag('span'));
