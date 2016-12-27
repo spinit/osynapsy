@@ -32,7 +32,7 @@ class GMapBox extends Component
     public function __construct($name)
     {
         parent::__construct('dummy',$name);
-        $this->requireCss(OSY_WEB_ROOT.'/css/omapgrid.css');
+        $this->requireCss('/__assets/Ocl/GMapBox/style.css');
         $this->requireJs('http://maps.google.com/maps/api/js?sensor=false&amp;language=en&libraries=drawing');
         //oform::$page->add_script('https://maps.googleapis.com/maps/api/js?libraries=drawing');
         $this->requireJs('/__assets/Lib/gmap3-6.0.0/gmap3.min.js');
