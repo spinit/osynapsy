@@ -35,7 +35,7 @@ class GMapBox extends Component
         $this->requireCss(OSY_WEB_ROOT.'/css/omapgrid.css');
         $this->requireJs('http://maps.google.com/maps/api/js?sensor=false&amp;language=en&libraries=drawing');
         //oform::$page->add_script('https://maps.googleapis.com/maps/api/js?libraries=drawing');
-        $this->requireJs('/lib/gmap3-6.0.0/gmap3.min.js');
+        $this->requireJs('/__assets/Lib/gmap3-6.0.0/gmap3.min.js');
         $this->requireJs('/__assets/Ocl/GMapBox/script.js');
         $this->map = $this->add(new Tag('div'))->att('class','osy-mapgrid');
         $this->add(new HiddenBox($this->id.'_ne_lat'));
