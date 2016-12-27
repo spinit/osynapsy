@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Core;
 
-use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Network\Router;
 use Osynapsy\Core\Request\Request;
 use Osynapsy\Core\Driver\DbPdo;
@@ -24,9 +23,9 @@ class Kernel
     public static function init($fileconf, $requestRoute)
     {        
         self::loadConfiguration($fileconf);
-        self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
-        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
         self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        self::$request->set('app.parameters', self::loadXmlConfig('/configuration/parameters/parameter','name','value'));        
+        self::$request->set('app.layouts', self::loadXmlConfig('/configuration/layouts/layout','name','path'));        
         self::$router = new Router($requestRoute, self::$request);
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
         self::$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
@@ -108,61 +107,17 @@ class Kernel
         return new DbPdo($connectionString);
     }
     
-    public static function loadXmlConfig($xpath, $dest, $kkey, $kval)
+    public static function loadXmlConfig($xpath, $kkey, $kval)
     {
+        $result = array();
         foreach (self::$repo['xmlconfig'] as $xml) {
             foreach ($xml->xpath($xpath) as $e) {
-                self::$repo[$dest][$e[$kkey]->__toString()] = (isset($e[$kval]) ? $e[$kval]->__toString() : '');
+                $result[$e[$kkey]->__toString()] = (isset($e[$kval]) ? $e[$kval]->__toString() : '');
             }
         }
+        return $result;
     }
 
-    public static function set($p,$v)
-    {
-        $ksearch = explode('.',$p);
-        $klast   = count($ksearch)-1;
-        $target = &self::$repo;
-        foreach($ksearch as $i => $k){
-            if ($klast == $i){
-                $target[$k] = $v;
-            } elseif (array_key_exists($k,$target)) {
-                $target = &$target[$k];
-            } elseif(count($ksearch) != ($i+1)) {
-                $target[$k] = array();
-                $target = &$target[$k];
-            }
-        }
-    }
-    
-    public function get($p)
-    {
-        if (empty($p)) {
-            return self::$repo;
-        }
-        $ksearch = explode('.',$p);
-        $target = self::$repo;
-        foreach ($ksearch as $k) {
-            if (!is_array($target)) {
-                return $target;
-            }
-            $target = array_key_exists($k, $target) ? $target[$k] : null;
-        }        
-        return $target;
-    }
-
-    public static function sendEmail($from, $a, $subject, $body, $html=false)
-    {
-        $head = "From: $from\r\n".
-                "Reply-To: $from\r\n".
-                "X-Mailer: PHP/".phpversion()."\n";
-        if ($html) {
-          $head .= "MIME-Version: 1.0\n";
-          $head .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-          $head .= "Content-Transfer-Encoding: 7bit\n\n";
-        }
-        return mail($a,$subject,$body,$head," -f ".$from);
-    }
-    
     public static function pageNotFound($message = 'Page not found')
     {
         ob_clean();
