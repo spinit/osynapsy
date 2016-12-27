@@ -29,7 +29,7 @@ class Kernel
         self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
         self::$router = new Router($requestRoute, self::$request);
         self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
-        self::$router->addRoute('OsynapsyAssetsManager','/__OsynapsyAsset/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
+        self::$router->addRoute('OsynapsyAssetsManager','/__asset/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
         if (self::runAppController()) {
             $response = self::runRouteController(self::$router->getRoute('controller'));
             if ($response !== false) {
@@ -41,7 +41,7 @@ class Kernel
     
     private static function runAppController()
     {
-        $app = self::$router->getRoute('application');        
+        $app = self::$router->getRoute('application');      
         if (empty($app)) {
             return true;
         }
