@@ -6,11 +6,11 @@ class CheckBox extends Component
     private $hidden = null;
     private $checkbox = null;
     
-    public function __construct($nam)
+    public function __construct($name)
     {
-        parent::__construct('span',$nam);
+        parent::__construct('span',$name);
         $this->hidden = $this->add('<input type="hidden" name="'.$name.'" value="0">');
-        $this->checkbox = $this->add(new InputBox('checkbox',$nam,$nam));
+        $this->checkbox = $this->add(new InputBox('checkbox',$name,$name));
         $this->checkbox->att('class','osy-check')->att('value','1');
     }
     
