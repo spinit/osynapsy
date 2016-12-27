@@ -7,7 +7,7 @@ use Osynapsy\Core\Lib\Tag;
 /**
  * Description of Pager
  *
- * @author pietr
+ * @author Pietro Celeste
  */
 class Pager extends Component
 {
@@ -15,10 +15,10 @@ class Pager extends Component
     protected $data = array();
     private $db;
     private $filters = array();
-    private $fields = array();
     private $loaded = false;
     private $par;
     private $sql;  
+    private $orderBy = null;
     private $page = array(
         'dimension' => 10,
         'total' => 1,
@@ -28,19 +28,19 @@ class Pager extends Component
         'rows' => 0        
     );
     //put your code here
-    public function __construct($id, $dim = 10, $tag = 'div')
+    public function __construct($id, $dim = 10, $tag = 'div', $infiniteContainer = false)
     {        
         parent::__construct($tag, $id);
+        if (!empty($infiniteContainer)) {
+            $this->setInfiniteScroll($infiniteContainer);
+        }
         $this->requireJs('/__assets/osynapsy/Bcl/Pager/script.js');
-        $this->att('class','BclPager');
+        $this->att('class','BclPager',true);
         if ($tag == 'form') {
             $this->att('method','post');
         }
         if ($dim) {
             $this->page['dimension'] = $dim;
-        }
-        if ($id) {
-            $this->addField($id);
         }
     }
     
@@ -49,9 +49,7 @@ class Pager extends Component
         if (!$loaded) {
             $this->loadData;
         }
-        foreach($this->fields as $fieldId) { 
-            $this->add(new HiddenBox($fieldId));
-        }        
+        $this->add(new HiddenBox($this->id));
         $ul = $this->add(new Tag('ul'));
         $ul->att('class','pagination');
         $liFirst = $ul->add(new Tag('li'));
@@ -88,11 +86,6 @@ class Pager extends Component
                ->add('&raquo;');
     }
     
-    public function addField($field)
-    {
-        $this->fields[] = $field;
-    }
-    
     public function addFilter($field, $value = null)
     {
         $this->filters[$field] = $value;
@@ -103,12 +96,15 @@ class Pager extends Component
         $sql = "SELECT a.* FROM ({$this->sql}) a {$where} ";
         if (!empty($_REQUEST[$this->id.'_order'])) {
             $sql .= ' ORDER BY '.str_replace(array('][','[',']'),array(',','',''),$_REQUEST[$this->id.'_order']);
+        } elseif ($this->orderBy) {
+            $sql .= "\nORDER BY {$this->orderBy}";
         }
         if (empty($this->page['dimension'])) {
             return $sql;
         }
         $startFrom = ($this->page['current'] - 1) * $this->page['dimension'];
         $startFrom = max(0, $startFrom);
+        
         $sql .= "\nLIMIT ".$startFrom." , ".$this->page['dimension'];
         return $sql;
     }
@@ -118,6 +114,8 @@ class Pager extends Component
         $sql = "SELECT a.* FROM ({$this->sql}) a {$where} ";
         if (!empty($_REQUEST[$this->id.'_order'])) {
             $sql .= ' ORDER BY '.str_replace(array('][','[',']'),array(',','',''),$_REQUEST[$this->id.'_order']);
+        } elseif ($this->orderBy) {
+            $sql .= "\nORDER BY {$this->orderBy}";
         }
         if (empty($this->page['dimension'])) {
             return $sql;
@@ -175,6 +173,10 @@ class Pager extends Component
             return;
         }
         $this->page['total'] = ceil($this->total['rows'] / $this->page['dimension']);
+        $this->att(
+            'data-page-max',
+            max($this->page['total'],1)
+        );
         switch ($_REQUEST[$this->id]) {
             case 'first':
                 $this->page['current'] = 1;
@@ -235,8 +237,8 @@ class Pager extends Component
             $this->total['rows'] = $this->db->execUnique($count, $this->par);
             $this->att('data-total-rows',$this->total['rows']);
         } catch(\Exception $e) {
-            $this->errors[] = '<pre>'.$count."\n".$e->getMessage().'</pre>';
-            return;
+            echo $this->errors[] = '<pre>'.$count."\n".$e->getMessage().'</pre>';
+            return array();
         }
         
         $this->calcPage();
@@ -261,7 +263,7 @@ class Pager extends Component
         //die(print_r($this->data,true));
         //Salvo le colonne in un option
         $this->columns = $this->db->getColumns();
-        return $this->data;
+        return empty($this->data) ? array() : $this->data;
     }
     
     public function setSql($db, $cmd, array $par = array())
@@ -269,10 +271,22 @@ class Pager extends Component
         $this->db = $db;
         $this->sql = $cmd;
         $this->par = $par;
+        return $this;
     }
     
-    public function getTotal($key)
+    public function setOrder($field)
     {
-        return array_key_exists($key, $this->total) ? $this->total[$key] : null;
+        $this->orderBy = $field;
+    }
+    
+    public function setInfiniteScroll($container)
+    {
+        $this->requireJs('/__assets/osynapsy/Bcl/Pager/imagesloaded.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/Pager/wookmark.js');
+        $this->att('class','infinitescroll',true)->att('style','display: none');
+        if ($container[0] != '#' ||  $container[0] != '#') {
+            $container = '#'.$container;
+        }
+        return $this->att('data-container',$container);
     }
 }
