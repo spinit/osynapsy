@@ -15,9 +15,9 @@ class Select extends ComboBox2
     {        
         parent::__construct($name);
         $this->class = 'osy-select';
-        $this->requireCss('/__asset/osynapsy/Bcl/Select/bootstrap-select.css');
-        $this->requireJs('/__asset/osynapsy/Bcl/Select/bootstrap-select.js');
-        $this->requireJs('/__asset/osynapsy/Bcl/Select/script.js');
+        $this->requireCss('/__assets/osynapsy/Bcl/Select/bootstrap-select.css');
+        $this->requireJs('/__assets/osynapsy/Bcl/Select/bootstrap-select.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/Select/script.js');
         //$this->par('option-select-disable',false);
         if ($multiple) {
             $this->setMultiSelect();
