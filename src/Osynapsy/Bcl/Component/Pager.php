@@ -31,7 +31,7 @@ class Pager extends Component
     public function __construct($id, $dim = 10, $tag = 'div')
     {        
         parent::__construct($tag, $id);
-        $this->requireJs('/__asset/osynapsy/Bcl/Pager/script.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/Pager/script.js');
         $this->att('class','BclPager');
         if ($tag == 'form') {
             $this->att('method','post');
