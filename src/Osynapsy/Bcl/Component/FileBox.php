@@ -3,8 +3,6 @@ namespace Osynapsy\Bcl\Component;
 
 use Osynapsy\Core\Lib\Tag;
 use Osynapsy\Ocl\Component\Component;
-use Osynapsy\Ocl\Component\InputBox;
-use Osynapsy\Core\Kernel;
 
 class FileBox extends Component
 {
@@ -22,7 +20,7 @@ class FileBox extends Component
                 </span>
             </span>
         */
-        $this->requireJs('/__OsynapsyAsset/Bcl/FileBox/script.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/FileBox/script.js');
         
         parent::__construct('dummy',$name);
         $this->span = $this->add(new Tag('span'));

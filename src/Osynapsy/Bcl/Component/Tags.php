@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynapsy\Core\Kernel;
 use Osynapsy\Core\Lib\Tag;
 use Osynapsy\Ocl\Component\Component;
 use Osynapsy\Ocl\Component\HiddenBox;
@@ -17,8 +16,8 @@ class Tags extends Component
     {
         parent::__construct('div', $name);
         $this->hidden = $this->add(new HiddenBox($name));        
-        $this->requireJs('/__OsynapsyAsset/Bcl/Tags/script.js');
-        $this->requireCss('/__OsynapsyAsset/Bcl/Tags/style.css');
+        $this->requireJs('/__assets/osynapsy/Bcl/Tags/script.js');
+        $this->requireCss('/__assets/osynapsy/Bcl/Tags/style.css');
         $this->labelClass = $class;
     }
     

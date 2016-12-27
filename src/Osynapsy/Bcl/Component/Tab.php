@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynapsy\Core\Kernel;
 use Osynapsy\Core\Lib\Tag;
 use Osynapsy\Ocl\Component\Component;
 use Osynapsy\Ocl\Component\HiddenBox;
@@ -19,7 +18,7 @@ class Tab extends Component
     {
         parent::__construct('dummy');
         $this->id = $id;
-        $this->requireJs('/__OsynapsyAsset/Bcl/Tab/script.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/Tab/script.js');
         $this->add(new HiddenBox($id));
         $this->ul = $this->add(new Tag('ul'));
         $this->ul->att([

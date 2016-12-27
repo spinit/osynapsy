@@ -3,6 +3,7 @@ namespace Osynapsy\Core;
 
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Network\Router;
+use Osynapsy\Core\Request\Request;
 use Osynapsy\Core\Driver\DbPdo;
 use Osynapsy\Core\Driver\DbOci;
 
@@ -14,8 +15,7 @@ class Kernel extends Base
     private $repo = array(
         'xmlconfig' => array(),
         'events' => array(), 
-        'layouts' => array(),
-        'query' => null
+        'layouts' => array()        
     );
     public $router;
     public $request;
@@ -24,19 +24,17 @@ class Kernel extends Base
     public $db = array();
     public $dba = array();
 
-    public function init($fileconf, $query)
-    {
-        $this->set('query',is_null($query) ? '/' :  $query);
-        $this->loadConfiguration($fileconf);
-        $this->loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');
-        $this->loadDatasources();
-        $this->loadXmlConfig('/configuration/layouts/layout','layouts','name','path');
-        $this->$router = new Router();        
-        $this->$router->loadXml($this->$repo['xmlconfig'], '/configuration/routes/route');
-        $this->$request = $this->$router->getRequest();
-        $this->$router->addRoute('OsynapsyAssetsManager','/__OsynapsyAsset/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
-        if ($this->runAppController()) {
-            $response = $this->runRouteController($this->$router->getRoute('controller'));
+    public function init($fileconf, $requestRoute)
+    {        
+        self::loadConfiguration($fileconf);
+        self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
+        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
+        self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        self::$router = new Router($requestRoute, self::$request);
+        self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
+        self::$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
+        if (self::runAppController()) {
+            $response = self::runRouteController(self::$router->getRoute('controller'));
             if ($response !== false) {
                 return $response;
             }
@@ -46,11 +44,13 @@ class Kernel extends Base
     
     private  function runAppController()
     {
-        $app = $this->$router->getRoute('application');
+        $app = self::$router->getRoute('application');      
         if (empty($app)) {
             return true;
-        }        
-        if (empty($this->$repo['xmlconfig'][$app]['controller'])) {
+        }
+        self::loadDatasources("/configuration/app/$app/datasources/db");
+        
+        if (empty(self::$repo['xmlconfig'][$app]['controller'])) {
             return true;
         }
         //If app has applicationController instance it before recall route controller;
@@ -85,32 +85,33 @@ class Kernel extends Base
         }
     }
 
-    private  function loadDatasources()
+    private function loadDatasources($path = '/configuration/datasources/db')
     {
-        foreach ($this->$repo['xmlconfig'] as $xml) {
-            $nConn = 0;
-            foreach ($xml->xpath('/configuration/datasources/db') as $e) {
-                $par = (array) $e->attributes(); //['@attributes'];
+        foreach (self::$repo['xmlconfig'] as $xml) {            
+            foreach ($xml->xpath($path) as $e) {                     
                 $connectionStr = (string) $e[0];
                 $connectionSha = sha1($connectionStr);
                 if (array_key_exists($connectionSha, $this->$db)) {
                     continue;
                 }
-                if (strpos($connectionStr,'oracle') !== false) {
-                    $this->$db[$connectionSha] = new DbOci($connectionStr);
-                } else {
-                    $this->$db[$connectionSha] = new DbPdo($connectionStr);
-                }               
-                $this->$db[$connectionSha]->connect();
-                if ($nConn === 0) {
-                    $this->$dba = $this->$db[$connectionSha];
+                self::$db[$connectionSha] = self::getDbConnection($connectionStr);               
+                self::$db[$connectionSha]->connect();
+                if (empty(self::$dba)) {
+                    self::$dba = self::$db[$connectionSha];
                 }
-                $nConn++;
             }
         }
     }
 
-    public  function loadXmlConfig($xpath, $dest, $kkey, $kval)
+    private function getDbConnection($connectionString)
+    {        
+        if (strpos($connectionString, 'oracle') !== false) {
+            return new DbOci($connectionString);
+        } 
+        return new DbPdo($connectionString);
+    }
+    
+    public function loadXmlConfig($xpath, $dest, $kkey, $kval)
     {
         foreach ($this->$repo['xmlconfig'] as $xml) {
             foreach ($xml->xpath($xpath) as $e) {
