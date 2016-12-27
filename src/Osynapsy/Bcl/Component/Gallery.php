@@ -17,8 +17,7 @@ class Gallery extends Component
     {
         parent::__construct('div', $id);
         $this->add(new Tag('span'))
-             ->att('class','gallery')
-             ->add($label);
+             ->att('class','gallery');
         $this->dim = $dim;
     }
     
