@@ -90,8 +90,7 @@ class Router
     public function addRoute($id, $url, $controller, $templateId, $application, $attributes=array())
     {    
         $this->routes->addRoute($id, $url, $controller, $templateId);
-        $this->isCurrentRoute($url, $controller, $templateId, $application, $attributes);
-        
+        $this->isCurrentRoute($url, $controller, $templateId, $application, $attributes);        
     }
     
     public function getRoute($key='')
