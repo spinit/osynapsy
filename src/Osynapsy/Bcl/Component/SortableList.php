@@ -16,9 +16,9 @@ class SortableList extends ListUnordered
     {
         parent::__construct($name);
         
-        $this->requireCss('/__OsynapsyAsset/Bcl/SortableList/style.css');
-        $this->requireJs('/__OsynapsyAsset/Bcl/SortableList/jquery.sortable.js');
-        $this->requireJs('/__OsynapsyAsset/Bcl/SortableList/script.js');        
+        $this->requireCss('/__asset/osynapsy/Bcl/SortableList/style.css');
+        $this->requireJs('/__asset/osynapsy/Bcl/SortableList/jquery.sortable.js');
+        $this->requireJs('/__asset/osynapsy/Bcl/SortableList/script.js');        
         $this->att('class','sortable-list');
     }
     
