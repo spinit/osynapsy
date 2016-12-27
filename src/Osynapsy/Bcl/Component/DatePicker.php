@@ -11,8 +11,8 @@ class DatePicker extends Component
     public function __construct($id)
     {
         $this->datePickerId = $id;
-        $this->requireJs('/__OsynapsyAsset/Bcl/DatePicker/script.js');
-        $this->requireCss('/__OsynapsyAsset/Bcl/DatePicker/style.css');
+        $this->requireJs('/__asset/osynapsy/Bcl/DatePicker/script.js');
+        $this->requireCss('/__asset/osynapsy/Bcl/DatePicker/style.css');
         parent::__construct('div',$id.'_datepicker');
         $this->att('class','input-group');
         $this->add(new TextBox($id))->att('class','date date-picker form-control');
