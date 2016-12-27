@@ -8,6 +8,6 @@ class CheckList extends OclCheckList
     public function __construct($name)
     {
         parent::__construct($name);        
-        $this->requireCss('/__asset/osynapsy/Bcl/CheckList/style.css');
+        $this->requireCss('/__assets/osynapsy/Bcl/CheckList/style.css');
     }
 }
