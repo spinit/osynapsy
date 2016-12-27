@@ -13,8 +13,8 @@ class ContextMenu extends Component
     
     public function __construct($id, $link, $label, $class='')
     {
-        $this->requireCss('/__OsynapsyAsset/Bcl/ContextMenu/style.css');
-        $this->requireJs('/__OsynapsyAsset/Bcl/ContextMenu/script.js');
+        $this->requireCss('/__asset/osynapsy/Bcl/ContextMenu/style.css');
+        $this->requireJs('/__asset/osynapsy/Bcl/ContextMenu/script.js');
         parent::__construct('div', $id);
         $this->att('class', 'BclContextMenu dropdown clearfix');
         $this->ul = $this->add(new Tag('ul'))
