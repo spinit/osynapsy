@@ -31,10 +31,10 @@ class ImageBox extends Component
     
     public function __construct($id)
     {        
-        $this->requireCss('/__asset/osynapsy/Bcl/ImageBox2/style.css');
-        $this->requireCss('/__asset/osynapsy/Bcl/ImageBox2/cropper.css');
-        $this->requireJs('/__asset/osynapsy/Bcl/ImageBox2/cropper.js');
-        $this->requireJs('/__asset/osynapsy/Bcl/ImageBox2/script.js');
+        $this->requireCss('/__assets/osynapsy/Bcl/ImageBox2/style.css');
+        $this->requireCss('/__assets/osynapsy/Bcl/ImageBox2/cropper.css');
+        $this->requireJs('/__assets/osynapsy/Bcl/ImageBox2/cropper.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/ImageBox2/script.js');
         parent::__construct('div',$id);
         $this->att('class','osy-imagebox-bcl')->att('data-action','save');
         $this->add(new HiddenBox($id));
