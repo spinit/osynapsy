@@ -268,8 +268,8 @@ class Pager extends Component
     
     public function setInfiniteScroll($container)
     {
-        $this->requireJs('/__assets/osynapsy/Bcl/Pager/imagesloaded.js');
-        $this->requireJs('/__assets/osynapsy/Bcl/Pager/wookmark.js');
+        $this->requireJs('/__assets/osynapsy/Lib/imagesLoaded-4.1.1/imagesloaded.js');
+        $this->requireJs('/__assets/osynapsy/Lib/wookmark-2.1.2/Pager/wookmark.js');
         $this->att('class','infinitescroll',true)->att('style','display: none');
         if ($container[0] != '#' ||  $container[0] != '#') {
             $container = '#'.$container;
