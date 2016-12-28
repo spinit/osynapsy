@@ -15,6 +15,7 @@ class Pager extends Component
     protected $data = array();
     private $db;
     private $filters = array();
+    private $fields = array();
     private $loaded = false;
     private $par;
     private $sql;  
@@ -64,7 +65,7 @@ class Pager extends Component
         $app = floor($dim / 2);
         $pageMin = max(1, $this->page['current'] - $app);
         $pageMax = max($dim, min($this->page['current'] + $app, $this->page['total']));
-        $pageMin = min($pageMin,$this->page['total'] - $dim + 1);
+        $pageMin = min($pageMin, $this->page['total'] - $dim + 1);
         for ($i = $pageMin; $i <= $pageMax; $i++) {
             $liCurrent = $ul->add(new Tag('li'));
             if ($i == $this->page['current']) {
@@ -84,6 +85,11 @@ class Pager extends Component
                ->att('href','#')
                ->att('data-value','last')
                ->add('&raquo;');
+    }
+    
+    public function addField($field)
+    {
+        $this->fields[] = $field;
     }
     
     public function addFilter($field, $value = null)
@@ -200,28 +206,9 @@ class Pager extends Component
         }
     }
     
-    private function calcStatistics()
+    public function getTotal($key)
     {
-        //Calcolo statistiche
-        if (!$this->sqlStat) {
-            return;
-        }
-        try {
-            $sql_stat = Kernel::replaceVariable(str_replace('<[datasource-sql]>',$sql,$sql_stat).$whr);
-            $stat = $this->db->execUnique($sql_stat,null,'ASSOC');
-            if (!is_array($stat)) $stat = array($stat);
-            $dstat = tag::create('div')->att('class',"osy-datagrid-stat");
-            $tr = $dstat->add(tag::create('table'))->att('align','right')->add(tag::create('tr'));
-            foreach ($stat as $k=>$v) {
-                $v = ($v > 1000) ? number_format($v,2,',','.') : $v;
-                $tr->add(Tag::create('td'))->add('&nbsp;');
-                $tr->add(Tag::create('td'))->att('title',$k)->add($k);
-                $tr->add(Tag::create('td'))->add($v);
-            }
-            $this->__par['div-stat'] = $dstat;
-        } catch(\Exception $e) {
-                $this->par('error-in-sql-stat','<pre>'.$sql_stat."\n".$e->getMessage().'</pre>');
-        }
+        return array_key_exists($key, $this->total) ? $this->total[$key] : null;
     }
     
     public function loadData()
