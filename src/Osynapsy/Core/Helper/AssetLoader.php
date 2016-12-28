@@ -24,7 +24,7 @@ class AssetLoader extends Controller
         if (!is_file($filename)) {
             return false;
         }        
-        $this->copyFileToCache('.'.$this->request->get('page.url'), $filename);        
+        $this->copyFileToCache($this->request->get('page.url'), $filename);        
         $this->sendFile($filename);
         return true;
     }
@@ -36,15 +36,25 @@ class AssetLoader extends Controller
         }
         $path = explode('/', $webPath);
         $file = array_pop($path);
-        $current = './';
+        $currentPath = './';
+        $isFirst = true;
         foreach($path as $dir){
-            $current .= $dir.'/';
-            if (file_exists($current)) {
+            if (empty($dir)) {
                 continue;
             }
-            mkdir($current);
+            $currentPath .= $dir.'/';            
+            //If first directory (__assets) not exists or isn't writable abort copy
+            if ($isFirst === true && !is_writable($currentPath)) {                
+                return false;
+            }
+            $isFirst = false;
+            if (file_exists($currentPath)) {
+                continue;
+            }
+            mkdir($currentPath);
         }
-        return copy($assetsPath, $webPath);
+        $currentPath .= $file;        
+        return copy($assetsPath, $currentPath);
     }
     
     public function pageNotFound()
