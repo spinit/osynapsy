@@ -3,7 +3,7 @@ namespace Osynapsy\Core\Model;
 
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Model\ModelField;
-use Osynapsy\Core\Util\ImageProcessor;
+use Osynapsy\Core\Helper\ImageProcessor;
 
 abstract class Model
 {
@@ -173,7 +173,7 @@ abstract class Model
         if (!is_array($this->values)) {
             return;
         }
-        foreach ($this->repo->get('fields') as $k => $f) {
+        foreach ($this->repo->get('fields') as $f) {
             if (!array_key_exists($f->html, $_REQUEST) && array_key_exists($f->name, $this->values)) {
                 $_REQUEST[ $f->html ] = $this->values[ $f->name ];
             }
@@ -202,11 +202,6 @@ abstract class Model
         
         foreach ($this->repo->get('fields') as $k => $f) {
             $val = $f->value;
-            if (in_array($f->type,array('file','image')) && empty($val)) {
-                //print_r($f);
-                //exit;
-                //continue;
-            }
             if (!$f->isNullable() && $val !== '0' && empty($val)) {
                 $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
             }
@@ -220,8 +215,8 @@ abstract class Model
                 case 'money':
                 case 'numeric':
                 case 'number':
-                    if (filter_var($val, FILTER_VALIDATE_FLOAT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non � numerico.');
+                    if (filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
                     }
                     break;
                 case 'integer':
@@ -261,21 +256,6 @@ abstract class Model
                 continue;
             }
             $values[$f->name] = ImageProcessor::upload($f->html);
-            //Make thumbnail
-            if ($th = $f->thumbnail) {
-                if (!is_array($th) && count($th) === count($th, COUNT_RECURSIVE)) {
-                    $th = array($th);
-                }
-                foreach ($th as $dim) {
-                    $thumbnailName = ImageProcessor::thumbnail(
-                        $_SERVER['DOCUMENT_ROOT'].$values[$f->name],
-                        $dim
-                    );
-                    if (!empty($dim[2])) {
-                        $values[$dim[2]] = $thumbnailName;
-                    }
-                }
-            }
         }
         if ($this->controller->response->error()) { 
             return; 
