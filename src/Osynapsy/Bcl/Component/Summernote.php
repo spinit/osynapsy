@@ -7,8 +7,8 @@ class Summernote extends TextArea
     {
         parent::__construct($name);        
         $this->att('class','summernote');
-        $this->requireCss('/__assets/osynapsy/Bcl/Summernote/summernote.css');
-        $this->requireJs('/__assets/osynapsy/Bcl/Summernote/summernote.js');
-        $this->requireJs('/__assets/osynapsy/Bcl/Summernote/summernote.start.js');  
+        $this->requireCss('/__assets/osynapsy/Lib/summernote-0.8.2/summernote.css');
+        $this->requireJs('/__assets/osynapsy/Lib/summernote-0.8.2/summernote.js');
+        $this->requireJs('/__assets/osynapsy/Bcl/Summernote/script.js');  
     }    
 }
