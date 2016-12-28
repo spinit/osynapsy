@@ -1,16 +1,18 @@
 <?php
 namespace Osynapsy\Core\Model;
 
-use Osynapsy\Core\Kernel as Kernel;
-
 class ModelField 
 {
     private $repo = array(
-        'value'       => null,
-        'is_pk'       => false,
-        'nullable'    => true, 
-        'readonly'    => false,
-        'rawvalue'    => null
+        'fixlength' => null,
+        'is_pk' => false,
+        'maxlength' => null,
+        'minlength' => null,
+        'nullable' => true, 
+        'readonly' => false,
+        'rawvalue' => null,
+        'unique' => false,
+        'value' => null
     );
     private $model;
     public $type;
@@ -67,6 +69,36 @@ class ModelField
         return $this;
     }
 
+    public function isUnique($v=null)
+    {
+        if (is_null($v)) { 
+            return $this->repo['unique']; 
+        }
+        $this->repo['unique'] = $v;
+        return $this;
+    }
+    
+    public function setFixLength($len)
+    {
+        if (!is_array($len)) {
+            $len= array($len);
+        }
+        $this->fixlength = $len;
+        return $this;
+    }
+    
+    public function setMaxLength($length)
+    {
+        $this->maxlength = $length;
+        return $this;
+    }
+    
+    public function setMinLenght($length)
+    {
+        $this->minlength = $lenght;
+        return $this;
+    }
+    
     public function setValue($val, $def = null)
     {
         if ($val !== '0' && $val !== 0 && empty($val)) {
