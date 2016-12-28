@@ -1,7 +1,5 @@
 <?php
-namespace Osynapsy\Core\Helper;
-
-use Osynapsy\Core\Controller\Controller;
+namespace Osynapsy\Core\Controller;
 
 class AssetLoader extends Controller
 {
