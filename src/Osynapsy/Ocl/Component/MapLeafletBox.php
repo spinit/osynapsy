@@ -23,23 +23,23 @@ namespace Osynapsy\Ocl\Component;
  * @date-update     31/10/2014
  */
  
+use Osynapsy\Core\Lib\Tag;
 
 class MapLeafletBox extends Component
 {
 	private $map;
-	private $cnt;
 	
 	public function __construct($name)
 	{
 		parent::__construct('dummy',$name);
-		$this->requireCss(OSY_WEB_ROOT.'/css/leaflet.css');
-		$this->requireCss(OSY_WEB_ROOT.'/css/leaflet.draw.css');
-		$this->requireJs('/__assets/Lib/Leaflet/leaflet.js');
-		$this->requireJs('/__assets/Lib/Leaflet/leaflet.awesome-markers.min.js');
-		$this->requireJs('/__assets/Lib/Leaflet/leaflet.draw.js');
+		$this->requireCss('/__assets/Lib/leaflet-0.7.3/leaflet.css');
+		$this->requireCss('/__assets/Lib/leaflet-0.7.3/leaflet.draw.css');
+		$this->requireJs('/__assets/Lib/leaflet-0.7.3/leaflet.js');
+		$this->requireJs('/__assets/Lib/leaflet-0.7.3/leaflet.awesome-markers.min.js');
+		$this->requireJs('/__assets/Lib/leaflet-0.7.3/leaflet.draw.js');
 		$this->requireJs('/__assets/Ocl/MapLeafletBox/script.js');
 
-		$this->map = $this->add(tag::create('div'))->att('class','osy-mapgrid-leaflet');
+		$this->map = $this->add(new Tag('div'))->att('class','osy-mapgrid-leaflet');
 		$this->add(new HiddenBox($this->id.'_ne_lat'));
         $this->add(new HiddenBox($this->id.'_ne_lng'));
         $this->add(new HiddenBox($this->id.'_sw_lat'));
