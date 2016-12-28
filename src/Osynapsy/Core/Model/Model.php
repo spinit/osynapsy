@@ -158,16 +158,24 @@ abstract class Model
         $this->assocData();
     }
     
+    protected function addError($errorId, $field)
+    {
+        $error = str_replace(
+            array('<fieldname>','<value>'),
+            array('<!--'.$field->html.'-->',$field->value),            
+            $this->errorMessages[$errorId]
+        );
+        $this->controller->response->error($field->html, $error);
+    }
+    
     public function assocData()
     {
-        if (is_array($this->values)) {
-            foreach ($this->repo->get('fields') as $k => $f) {
-                if (!array_key_exists($f->html, $_REQUEST) && array_key_exists($f->name, $this->values)) {
-                    if ($f->html == '_fk') { 
-                        $_REQUEST[$f->html] = $this->values[ $f->name ]; 
-                    }
-                    $_REQUEST[ $f->html ] = $this->values[ $f->name ];
-                }
+        if (!is_array($this->values)) {
+            return;
+        }
+        foreach ($this->repo->get('fields') as $k => $f) {
+            if (!array_key_exists($f->html, $_REQUEST) && array_key_exists($f->name, $this->values)) {
+                $_REQUEST[ $f->html ] = $this->values[ $f->name ];
             }
         }
     }
@@ -200,7 +208,12 @@ abstract class Model
                 //continue;
             }
             if (!$f->isNullable() && $val !== '0' && empty($val)) {
-                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> � obbligatorio.');
+                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
+            }
+            if ($f->isUnique() && $val) {
+                if ($this->db->execUnique("SELECT COUNT(*) FROM {$this->table} WHERE {$f->name} = ?", array($val))) {
+                    $this->addError('unique', $f);
+                }
             }
             switch ($f->type) {
                 case 'float':
@@ -217,6 +230,22 @@ abstract class Model
                         $this->controller->response->error($f->html,'Il campo '.$f->html.' non � numerico.');
                     }
                     break;
+            }
+            //Controllo la lunghezza massima della stringa. Se impostata.
+            if ($f->maxlength) {
+                if (strlen($val) > $f->maxlength) {
+                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta massimo '.$f->maxlength.' caratteri.');
+                }
+            }
+            if ($f->minlength) {
+                if (strlen($val) < $f->minlength) {
+                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta minimo '.$f->minlength.' caratteri.');
+                }
+            }
+            if ($f->fixlength) {
+                if (!in_array(strlen($val),$f->fixlength)) {
+                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta solo valori con lunghezza pari a '.implode(' o ',$f->fixlength).' caratteri');
+                }
             }
             if ($f->isPkey()) {
                 $keys[] = $f->name;
