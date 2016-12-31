@@ -135,4 +135,3 @@ abstract class ModelEav extends Model
         $this->field['value'] = $valueField;
     }            
 }
-
