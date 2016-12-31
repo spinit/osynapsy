@@ -1,5 +1,5 @@
 <?php
-namespace Osynapsy\Core\Util;
+namespace Osynapsy\Core\Helper;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../vendor/phpthu/ThumbLib.inc.php');
 
@@ -45,7 +45,7 @@ class ImageProcessor
         if (!is_array($_FILES) || !array_key_exists($componentName,$_FILES)){ 
             return; 
         }
-        $pathUpload = Kernel::get('parameters.path-upload');
+        $pathUpload = Kernel::$controller->getRequest()->get('app.parameters.path-upload');
         if (empty($pathUpload)){
             Kernel::$controller->response->error('alert','configuration parameters.path-upload is empty'.print_r(Kernel::get('parameter'),true));         
         } elseif (!is_dir($_SERVER['DOCUMENT_ROOT'].$pathUpload)) {
