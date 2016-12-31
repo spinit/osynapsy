@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Ocl\Component;
 
-use Osynapsy\Core\Kernel as Kernel;
 use Osynapsy\Core\Lib\Tag as Tag;
 
 class ImageBox extends Component
@@ -84,15 +83,15 @@ class ImageBox extends Component
                 die($rsp);
                 break;
             case 'delete':
-                $table = Kernel::get('model.table');
-                $field = Kernel::get('model.fields.'.$this->id)->name;
-                $where = Kernel::get('model.record.where'); 
+                $table = $this->singleton('kernel')->get('model.table');
+                $field = $this->singleton('kernel')->get('model.fields.'.$this->id)->name;
+                $where = $this->singleton('kernel')->get('model.record.where'); 
                 if (!empty($where) || !is_array($where)){
                     die('Delete impossible pk is no.');
                 }
                 $rsp = 'OK';
                 try{
-                    Kernel::$dba->update($table,array($field=>null),$where);
+                    $this->singleton('kernel')->$dba->update($table,array($field=>null),$where);
                 } catch (Exception $e) {
                     $rsp = $e->getMessage();
                 }

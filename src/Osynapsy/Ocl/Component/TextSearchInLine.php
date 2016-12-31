@@ -23,7 +23,6 @@
  */
 namespace Osynapsy\Ocl\Component;
 
-use Osynapsy\Core\Kernel;
 use Osynapsy\Core\Lib\Tag;
 
 class TextSearchInLine extends Component
@@ -81,8 +80,8 @@ class TextSearchInLine extends Component
         if (empty($_REQUEST[$this->fieldSearchName])) {
             return false;
         }
-        $sql = Kernel::replaceVariable($this->get_par('datasource-sql'));
-        $rs  = Kernel::$dba->execQuery("SELECT * FROM (".$sql.") a",null,'ASSOC');
+        $sql = $this->singleton('kernel')->replaceVariable($this->get_par('datasource-sql'));
+        $rs  = $this->singleton('kernel')->$dba->execQuery("SELECT * FROM (".$sql.") a",null,'ASSOC');
         $ncor = count($rs);
         if (empty($ncor) || $ncor > 1) {
             return false;
@@ -96,9 +95,9 @@ class TextSearchInLine extends Component
             $_POST[$this->id.'_lbl'] = str_replace(' ','%',$_POST[$this->id.'_lbl']);
         }
         $tbl = new Tag('div');
-        $sql = Kernel::replaceVariable($this->get_par('datasource-sql'));
-        $rs  = Kernel::$dba->execQuery("SELECT * FROM (".$sql.") a",null,'ASSOC');
-        $cols = Kernel::$dba->getColumns();
+        $sql = $this->singleton('kernel')->replaceVariable($this->get_par('datasource-sql'));
+        $rs  = $this->singleton('kernel')->$dba->execQuery("SELECT * FROM (".$sql.") a",null,'ASSOC');
+        $cols = $this->singleton('kernel')->$dba->getColumns();
         foreach($cols as $col) {
             if ($col['name']=='_group') {
                 $rs = $this->groupRs($rs);

@@ -23,7 +23,6 @@
  */
 namespace Osynapsy\Ocl\Component;
 
-use Osynapsy\Core\Kernel as Kernel;
 use Osynapsy\Core\Lib\Tag as Tag;
 use Osynapsy\Ocl\Component\Component as Component;
 use Osynapsy\Ocl\Component\HiddenBox as HiddenBox;
@@ -47,7 +46,7 @@ class DataGrid extends Component
         $this->requireJs('/__assets/osynapsy/Ocl/DataGrid/script.js');
         $this->requireCss('/__assets/osynapsy/Ocl/DataGrid/style.css');
         parent::__construct('div',$name);
-        $this->db = empty($db) ? Kernel::$dba : $db;
+        $this->db = empty($db) ? $this->singleton('kernel')->$dba : $db;
         $this->att('class','osy-datagrid-2');
         $this->__par['type'] = 'datagrid';
         $this->__par['row-num'] = 10;
@@ -92,7 +91,7 @@ class DataGrid extends Component
                 FROM osy_obj o
                 INNER JOIN osy_obj_prp p ON (o.o_id = p.o_id )
                 WHERE o.o_own = ?";
-        $res = Kernel::$dbo->execQuery($sql,array($oid));
+        $res = $this->singleton('kernel')->$dbo->execQuery($sql,array($oid));
         foreach ($res as $rec) {
             $this->__par['column-object'][$rec['obj_nam']][$rec['prp_id']] = $rec['prp_vl'];
         }
@@ -726,7 +725,7 @@ class DataGrid extends Component
         //Calcolo statistiche
         if ($sql_stat = $this->get_par('datasource-sql-stat')) {
             try {
-                $sql_stat = Kernel::replaceVariable(str_replace('<[datasource-sql]>',$sql,$sql_stat).$whr);
+                $sql_stat = $this->singleton('kernel')->replaceVariable(str_replace('<[datasource-sql]>',$sql,$sql_stat).$whr);
                 $stat = $this->db->execUnique($sql_stat,null,'ASSOC');
                 if (!is_array($stat)) $stat = array($stat);
                 $dstat = tag::create('div')->att('class',"osy-datagrid-stat");
@@ -875,7 +874,7 @@ class DataGrid extends Component
         $add = $this->get_par('record-add');
         if (is_null($add)) $this->par('record-add',true);
         $this->par('record-update',true);
-        $res = Kernel::$dbo->execQuery("SELECT frm.o_id    AS id,
+        $res = $this->singleton('kernel')->$dbo->execQuery("SELECT frm.o_id    AS id,
                                              'index.php' as page, /* fty.p1    AS form_man, */
                                              dfld.p_vl   AS field_pkey,
                                              coalesce(hprp.p_vl,'480') AS height,

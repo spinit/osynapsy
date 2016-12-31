@@ -1,7 +1,9 @@
 <?php
 namespace Osynapsy\Core\Lib;
 
-class Tag
+use Osynapsy\Core\Base;
+
+class Tag extends Base
 {
     private $att = array();
     private $cnt = array();

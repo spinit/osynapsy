@@ -26,15 +26,15 @@ class Kernel extends Base
 
     public function init($fileconf, $requestRoute)
     {        
-        self::loadConfiguration($fileconf);
-        self::loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
-        self::loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
-        self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-        self::$router = new Router($requestRoute, self::$request);
-        self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
-        self::$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
-        if (self::runAppController()) {
-            $response = self::runRouteController(self::$router->getRoute('controller'));
+        $this->loadConfiguration($fileconf);
+        $this->loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
+        $this->loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
+        $this->$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
+        $this->$router = new Router($requestRoute, $this->$request);
+        $this->$router->loadXml($this->$repo['xmlconfig'], '/configuration/routes/route');       
+        $this->$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
+        if ($this->runAppController()) {
+            $response = $this->runRouteController($this->$router->getRoute('controller'));
             if ($response !== false) {
                 return $response;
             }
@@ -44,18 +44,18 @@ class Kernel extends Base
     
     private  function runAppController()
     {
-        $app = self::$router->getRoute('application');      
+        $app = $this->$router->getRoute('application');      
         if (empty($app)) {
             return true;
         }
-        self::loadDatasources("/configuration/app/$app/datasources/db");
+        $this->loadDatasources("/configuration/app/$app/datasources/db");
         
-        if (empty(self::$repo['xmlconfig'][$app]['controller'])) {
+        if (empty($this->$repo['xmlconfig'][$app]['controller'])) {
             return true;
         }
         //If app has applicationController instance it before recall route controller;
         $classControllerApp = str_replace(':','\\',$this->$repo['xmlconfig'][$app]['controller']);
-        $this->$appController = new $classControllerApp(Kernel::$dba, $this->$router->getRoute());
+        $this->$appController = new $classControllerApp($this->$dba, $this->$router->getRoute());
         return $this->$appController->run();
     }
     
@@ -87,17 +87,17 @@ class Kernel extends Base
 
     private function loadDatasources($path = '/configuration/datasources/db')
     {
-        foreach (self::$repo['xmlconfig'] as $xml) {            
+        foreach ($this->$repo['xmlconfig'] as $xml) {            
             foreach ($xml->xpath($path) as $e) {                     
                 $connectionStr = (string) $e[0];
                 $connectionSha = sha1($connectionStr);
                 if (array_key_exists($connectionSha, $this->$db)) {
                     continue;
                 }
-                self::$db[$connectionSha] = self::getDbConnection($connectionStr);               
-                self::$db[$connectionSha]->connect();
-                if (empty(self::$dba)) {
-                    self::$dba = self::$db[$connectionSha];
+                $this->$db[$connectionSha] = $this->getDbConnection($connectionStr);               
+                $this->$db[$connectionSha]->connect();
+                if (empty($this->$dba)) {
+                    $this->$dba = $this->$db[$connectionSha];
                 }
             }
         }

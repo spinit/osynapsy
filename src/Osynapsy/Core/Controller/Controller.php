@@ -6,9 +6,9 @@ use Osynapsy\Core\Request\Request;
 use Osynapsy\Ocl\Response\Html as HtmlResponse;
 use Osynapsy\Core\Response\Response;
 use Osynapsy\Core\Response\JsonResponse;
-use Osynapsy\Core\Kernel;
+use Osynapsy\Core\Base;
 
-abstract class Controller implements InterfaceController
+abstract class Controller extends Base implements InterfaceController
 {
     protected $actionKey = 'k-cmd';
     protected $db;
@@ -90,7 +90,7 @@ abstract class Controller implements InterfaceController
             return $this->execAction();
         }        
         $this->setResponse(new HtmlResponse());
-        if ($path = Kernel::get('layouts.'.$this->templateId)) {
+        if ($path = $this->singleton('kernel')->get('layouts.'.$this->templateId)) {
             $this->response->template = $this->response->getBuffer($path, $this);            
         }
         if ($this->model) {

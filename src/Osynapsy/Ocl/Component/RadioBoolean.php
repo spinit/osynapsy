@@ -2,7 +2,6 @@
 namespace Osynapsy\Ocl\Component;
 
 use Osynapsy\Core\Lib\Tag;
-use Osynapsy\Core\Kernel;
 
 class RadioBoolean extends Component
 {
@@ -13,7 +12,7 @@ class RadioBoolean extends Component
     public function __construct($name, $label = array('No','Si'))
     {
         parent::__construct('div');
-        Kernel::$controller->response->addContent('<link rel="stylesheet" href="/vendor/osynapsy/css/Bcl/RadioBoolean.css">','head');
+        $this->singleton('kernel')->$controller->response->addContent('<link rel="stylesheet" href="/vendor/osynapsy/css/Bcl/RadioBoolean.css">','head');
         $this->att('class','form-group radio-boolean');
         $component = $this->add(new Tag('div'))->att('id',$name);        
         $component->add('<span>'.$label[1].'</span>');

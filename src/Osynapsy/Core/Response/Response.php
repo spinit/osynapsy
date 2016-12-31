@@ -1,10 +1,12 @@
 <?php
 namespace Osynapsy\Core\Response;
 
+use Osynapsy\Core\Base;
+
 /**
  * Abstract Response
  */
-abstract class Response 
+abstract class Response extends Base
 {
     protected $repo = array(
         'content' => array(),

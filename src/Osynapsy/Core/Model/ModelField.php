@@ -1,9 +1,9 @@
 <?php
 namespace Osynapsy\Core\Model;
 
-use Osynapsy\Core\Kernel as Kernel;
+use Osynapsy\Core\Base;
 
-class ModelField 
+class ModelField extends Base
 {
     private $repo = array(
         'value'       => null,

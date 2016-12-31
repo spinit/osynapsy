@@ -1,9 +1,11 @@
 <?php
 include('../autoload.php');
 
-use Osynapsy\Base;
+use Osynapsy\Core\Base;
 
-
+$base = new Base();
+$kernel = $base->singleton('kernel');
+var_dump($kernel);
 ?>
 <html>
     <body>

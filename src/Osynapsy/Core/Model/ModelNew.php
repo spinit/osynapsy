@@ -1,12 +1,12 @@
 <?php
 namespace Osynapsy\Core\Model;
 
-use Osynapsy\Core\Kernel;
+use Osynapsy\Core\Base;
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Model\ModelField;
 use Osynapsy\Core\Util\ImageProcessor;
 
-abstract class Model
+abstract class Model extends Base
 {
     private $repo;
     protected $controller = null;
@@ -20,9 +20,9 @@ abstract class Model
     public function __construct($controller, $db = null)
     {
         $this->controller = $controller;
-        $this->db = empty($db) ? Kernel::$dba : $db;
+        $this->db = empty($db) ? $this->singleton('kernel')->$dba : $db;
         $this->repo = new Dictionary();
-        $this->repo->set('actions.after-insert', Kernel::get('page.url'))
+        $this->repo->set('actions.after-insert', $this->singleton('kernel')->get('page.url'))
                    ->set('actions.after-update', 'back')
                    ->set('actions.after-delete', 'back')
                    ->set('fields',array());
@@ -211,7 +211,7 @@ abstract class Model
                 //continue;
             }
             if (!$f->isNullable() && $val !== '0' && empty($val)) {
-                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
+                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> ï¿½ obbligatorio.');
             }
             switch ($f->type) {
                 case 'float':
@@ -219,13 +219,13 @@ abstract class Model
                 case 'numeric':
                 case 'number':
                     if (filter_var($val, FILTER_VALIDATE_FLOAT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non ï¿½ numerico.');
                     }
                     break;
                 case 'integer':
                 case 'int':
                     if (filter_var($val, FILTER_VALIDATE_INT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non ï¿½ numerico.');
                     }
                     break;
             }

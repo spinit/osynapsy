@@ -3,9 +3,9 @@ namespace Osynapsy\Core\Util;
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/../vendor/phpthu/ThumbLib.inc.php');
 
-use Osynapsy\Core\Kernel;
+use Osynapsy\Core\Base;
 
-class ImageProcessor
+class ImageProcessor extends Base
 {
     public static $errors = array();
     
@@ -42,19 +42,21 @@ class ImageProcessor
 
     public static function upload($componentName, $Option=null)
     {
+        $kernel = $this->singleton('kernel');
+        
         if (!is_array($_FILES) || !array_key_exists($componentName,$_FILES)){ 
             return; 
         }
-        $pathUpload = Kernel::get('parameters.path-upload');
+        $pathUpload = $kernel->get('parameters.path-upload');
         if (empty($pathUpload)){
-            Kernel::$controller->response->error('alert','configuration parameters.path-upload is empty'.print_r(Kernel::get('parameter'),true));         
+            $kernel->$controller->response->error('alert','configuration parameters.path-upload is empty'.print_r($kernel->get('parameter'),true));         
         } elseif (!is_dir($_SERVER['DOCUMENT_ROOT'].$pathUpload)) {
-            Kernel::$controller->response->error('alert','path-upload '.$_SERVER['DOCUMENT_ROOT'].$pathUpload.' not exists');
+            $kernel->$controller->response->error('alert','path-upload '.$_SERVER['DOCUMENT_ROOT'].$pathUpload.' not exists');
         } elseif (!is_writeable($_SERVER['DOCUMENT_ROOT'].$pathUpload)) {
-            Kernel::$controller->response->error('alert',''.$_SERVER['DOCUMENT_ROOT'].$pathUpload.' is not writeable.');
+            $kernel->$controller->response->error('alert',''.$_SERVER['DOCUMENT_ROOT'].$pathUpload.' is not writeable.');
         }
-        if (Kernel::$controller->response->error()) { 
-            Kernel::$controller->response->dispatch(); 
+        if ($kernel->$controller->response->error()) { 
+            $kernel->$controller->response->dispatch(); 
         }
         $fileName = $_FILES[$componentName]['name'];
         $tempName = $_FILES[$componentName]['tmp_name'];

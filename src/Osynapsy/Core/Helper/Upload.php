@@ -1,9 +1,9 @@
 ﻿<?php
 namespace Osynapsy\Core\Lib\Util;
 
-use Osynapsy\Core\Kernel;
+use Osynapsy\Core\Base;
 
-class Upload
+class Upload extends Base
 {
     private $path;
 
@@ -45,19 +45,21 @@ class Upload
 
     public static function upload($componentName, $Option=null)
     {
+        $kernel = $this->singleton('kernel');
+        
         if (!is_array($_FILES) || !array_key_exists($componentName,$_FILES)){ 
             return; 
         }
        
         if (empty($this->path)){
-            Kernel::$controller->response->error('alert','configuration parameters.path-upload is empty');         
+            $kernel->$controller->response->error('alert','configuration parameters.path-upload is empty');         
         } elseif (!is_dir($_SERVER['DOCUMENT_ROOT'].$this->path)) {
-            Kernel::$controller->response->error('alert','path-upload '.$_SERVER['DOCUMENT_ROOT'].$this->path.' not exists');
+            $kernel->$controller->response->error('alert','path-upload '.$_SERVER['DOCUMENT_ROOT'].$this->path.' not exists');
         } elseif (!is_writeable($_SERVER['DOCUMENT_ROOT'].$this->path)) {
-            Kernel::$controller->response->error('alert',''.$_SERVER['DOCUMENT_ROOT'].$this->path.' is not writeable.');
+            $kernel->$controller->response->error('alert',''.$_SERVER['DOCUMENT_ROOT'].$this->path.' is not writeable.');
         }
-        if (Kernel::$controller->response->error()) { 
-            Kernel::$controller->response->dispatch(); 
+        if ($kernel->$controller->response->error()) { 
+            $kernel->$controller->response->dispatch(); 
         }
         $fileName = $_FILES[$componentName]['name'];
         $tempName = $_FILES[$componentName]['tmp_name'];

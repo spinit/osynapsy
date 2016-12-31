@@ -8,59 +8,45 @@
 
 namespace Osynapsy\Core;
 
-use Osynapsy\Core\Env;
-use Osynapsy\Core\Kernel;
-
 /**
  * Description of Base
  *
  * @author ermanno
  */
-class Base {
+class Base
+{
     //put your code here
     private static $instances = array();
+    
+    private static $instanceDefault = array(
+        'env'=>'\\Osynapsy\\Core\\Env',
+        'kernel'=>'\\Osynapsy\\Core\\Kernel'
+    );
 
     /**
      * Impostazione/Recupero oggetti globali
+     * Se si passa un array siconfigurano le classi di default da utilizzare per inizializzare
+     * determinati elementi
+     * 
      * @param string $name
      * @return any
      */
     public function singleton($name)
     {
+        if (is_array($name)) {
+            foreach($name as $k=>$v) {
+                self::$instanceDefault[$k] = $v;
+            }
+            return;
+        }
         $args = func_get_args();
         if(count($args)>1) {
             self::$instances[$name] = $args[1];
         }
+        if (!isset(self::$instances[$name]) and isset(self::$instanceDefault[$name])) {
+            $class = self::$instanceDefault[$name];
+            self::$instances[$name] = new $class;
+        }
         return @self::$instances[$name];
-    }
-    
-    public function env()
-    {
-        $args = func_get_args();
-        if (count($args)) {
-            $this->singleton('env', $args[0]);
-        }
-        $util = $this->singleton('env');
-        if (!$util) {
-            $util = $this->singleton('env', new Env());
-        }
-        return $util;
-    }
-        
-    /**
-     * Method Factory per recuperare l'oggetto kernel
-     */
-    public function kernel()
-    {
-        $args = func_get_args();
-        if (count($args)) {
-            $kernel = $this->singleton('kernel', $args[0]);
-        } else {
-            $kernel = $kernel = $this->singleton('kernel');
-            if (!$kernel) {
-                $kernel = $this->singleton('kernel', new Kernel());
-            }
-        }
-        return $kernel;
     }
 }

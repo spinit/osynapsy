@@ -1,7 +1,6 @@
 <?php
 namespace Osynapsy\Ocl\Component;
 
-use Osynapsy\Core\Kernel as Kernel;
 use Osynapsy\Core\Lib\Tag as Tag;
 
 //costruttore del combo box
@@ -17,7 +16,7 @@ class ComboBox extends Component
     {
         parent::__construct('select',$this->nvl($id,$nam));
         $this->att('name',$nam);
-        $this->dba = Kernel::$dba;
+        $this->dba = $this->singleton('kernel')->$dba;
     }
     
     protected function __build_extra__()
