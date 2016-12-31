@@ -3,16 +3,18 @@ namespace Osynapsy\Core\Controller;
 
 class AssetLoader extends Controller
 {
-    private $path;
-    
+    protected $path;
+    protected $basePath;
+
     public function init()
     {
         $this->path = $this->getParameter(0);
+        $this->basePath = __DIR__ . '/../../assets/';
     }
     
     public function indexAction()
     {            
-        if (!$this->checkFile(__DIR__ . '/../../assets/'.$this->path)) {
+        if (!$this->checkFile($this->basePath . $this->path)) {
             return $this->pageNotFound();    
         }        
     }   
