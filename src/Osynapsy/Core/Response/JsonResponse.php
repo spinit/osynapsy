@@ -57,8 +57,11 @@ class JsonResponse extends Response
         }
         if (!is_null($oid) && is_null($err)){
             return array_key_exists('errors', $this->repo['content']) && array_key_exists($oid, $this->repo['content']['errors']);
-        } 
-        $this->message('errors', $oid, utf8_encode($err));
+        }         
+        if (function_exists('mb_detect_encoding') && !mb_detect_encoding($err, 'UTF-8', true)) {        
+            $err = \utf8_encode($err);
+        }
+        $this->message('errors', $oid, $err);
     }
     
     /**
