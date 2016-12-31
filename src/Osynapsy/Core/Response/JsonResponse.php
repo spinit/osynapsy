@@ -5,6 +5,8 @@ use Osynapsy\Core\Response\Response;
 
 /**
  * Implements Json response
+ * 
+ * @author Pietro Celeste <p.celeste@spinit.it>
  */
 class JsonResponse extends Response 
 {
