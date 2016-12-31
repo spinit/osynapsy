@@ -67,6 +67,11 @@ abstract class Controller implements InterfaceController
         return $this->response;
     }
     
+    public function getRequest()
+    {
+        return $this->request;
+    }    
+    
     abstract public function indexAction();
     
     abstract public function init();
