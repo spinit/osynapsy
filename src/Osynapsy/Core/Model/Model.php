@@ -200,7 +200,7 @@ abstract class Model
         $where = array();
         $keys = array();
         
-        foreach ($this->repo->get('fields') as $k => $f) {
+        foreach ($this->repo->get('fields') as $f) {
             $val = $f->value;
             if (!$f->isNullable() && $val !== '0' && empty($val)) {
                 $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
@@ -222,7 +222,16 @@ abstract class Model
                 case 'integer':
                 case 'int':
                     if (filter_var($val, FILTER_VALIDATE_INT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non � numerico.');
+                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                    }
+                    break;
+                case 'file':
+                case 'image':
+                    if (is_array($_FILES) && array_key_exists($f->html, $_FILES)) {
+                        $val = ImageProcessor::upload($f->html);
+                    } else {
+                        //For prevent overwrite of db value
+                        $f->readonly = true;
                     }
                     break;
             }
@@ -250,16 +259,12 @@ abstract class Model
             }
             if (!$f->readonly) {
                 $values[$f->name] = $val; 
-            }
-
-            if (!is_array($_FILES) || !array_key_exists($f->html, $_FILES)) {
-                continue;
-            }
-            $values[$f->name] = ImageProcessor::upload($f->html);
+            }            
         }
         if ($this->controller->response->error()) { 
             return; 
         }        
+        //die(print_r($values,true).''.print_r($f,true));
         if (empty($where)) {
             $this->insert($values, $keys);
         } else {
