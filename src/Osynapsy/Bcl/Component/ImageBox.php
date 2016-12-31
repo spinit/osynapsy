@@ -153,9 +153,10 @@ class ImageBox extends Component
         return $this;
     }
     
-    public static function crop($path, $x, $y, $w, $h)
+    public static function crop($path, $newWidth, $newHeight, $x, $y, $w, $h)
     {
-        $img = new Image($path);
+        $img = new Image($path);       
+        $img->resize($newWidth, $newHeight);
         $img->crop($x, $y, $w, $h);
         $img->save($path);
         return true;
