@@ -1,9 +1,8 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynapsy\Helper\Image;
+use Osynapsy\Core\Helper\Image;
 use Osynapsy\Ocl\Component\Component;
-use Osynapsy\Ocl\Component\HiddenBox;
 use Osynapsy\Core\Lib\Tag;
 
 class ImageBox extends Component
