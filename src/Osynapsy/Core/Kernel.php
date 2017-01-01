@@ -24,11 +24,27 @@ class Kernel
     {        
         self::loadConfiguration($fileconf);
         self::$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-        self::$request->set('app.parameters', self::loadXmlConfig('/configuration/parameters/parameter','name','value'));        
-        self::$request->set('app.layouts', self::loadXmlConfig('/configuration/layouts/layout','name','path'));        
-        self::$router = new Router($requestRoute, self::$request);
-        self::$router->loadXml(self::$repo['xmlconfig'], '/configuration/routes/route');       
-        self::$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Controller\\AssetLoader','','Osynapsy');
+        self::$request->set(
+            'app.parameters',
+            self::loadXmlConfig('/configuration/parameters/parameter', 'name', 'value')
+        );
+        self::$request->set(
+            'app.layouts',
+            self::loadXmlConfig('/configuration/layouts/layout', 'name', 'path')
+        );        
+        self::$router = new Router(
+            $requestRoute,
+            self::$request
+        );
+        self::loadRoutes(
+            self::$repo['xmlconfig'],
+            '/configuration/routes/route'
+        );       
+        return self::run();
+    }
+    
+    public static function run()
+    {
         if (self::runAppController()) {
             $response = self::runRouteController(self::$router->getRoute('controller'));
             if ($response !== false) {
@@ -36,6 +52,26 @@ class Kernel
             }
         }
         return self::pageNotFound();
+    }
+    
+    private static function loadRoutes($xmlDocs, $path)
+    {
+        foreach ($xmlDocs as $appName => $xml) {
+            foreach ($xml->xpath($path) as $e) {
+                $id = (string) $e['id'];
+                $url = (string) $e['path'];
+                $ctl = (string) trim(str_replace(':', '\\', $e[0]));
+                $tpl = (string) $e['template'];
+                self::$router->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
+            }
+        }
+        self::$router->addRoute(
+            'OsynapsyAssetsManager',
+            '/__assets/osynapsy/?*',
+            'Osynapsy\\Core\\Controller\\AssetLoader',
+            '',
+            'Osynapsy'
+        );
     }
     
     private static function runAppController()
@@ -117,7 +153,20 @@ class Kernel
         }
         return $result;
     }
-
+    
+    public static function loadRoute($xmlDocs, $path)
+    {
+        foreach ($xmlDocs as $appName => $xml) {
+            foreach ($xml->xpath($path) as $e) {
+                $id = (string) $e['id'];
+                $url = (string) $e['path'];
+                $ctl = (string) trim(str_replace(':', '\\', $e[0]));
+                $tpl = (string) $e['template'];
+                self::$router->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
+            }
+        }        
+    }
+    
     public static function pageNotFound($message = 'Page not found')
     {
         ob_clean();
