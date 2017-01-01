@@ -26,19 +26,6 @@ class Router
         $this->routes = new RouteCollection();        
     }
     
-    public function loadXml($xmlDocs, $path)
-    {
-        foreach ($xmlDocs as $appName => $xml) {
-            foreach ($xml->xpath($path) as $e) {
-                $id = (string) $e['id'];
-                $url = (string) $e['path'];
-                $ctl = (string) trim(str_replace(':', '\\', $e[0]));
-                $tpl = (string) $e['template'];
-                $this->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
-            }
-        }        
-    }
-    
     private function isCurrentRoute($url, $ctl, $tpl, $app, $attr=null)
     {
         $out = array();
