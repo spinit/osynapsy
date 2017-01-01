@@ -46,13 +46,11 @@ class ModelField
             return $this->is_pk; 
         } 
         $this->is_pk = $b;
-        $this->model->set('pkField', $this, true);
-        
         if ($this->value) {
             $html = $this->html;
             if (empty($_REQUEST[$html])) { 
                 $_REQUEST[$html] = $this->value; 
-            }            
+            }
         }
         return $this;
     }
