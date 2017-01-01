@@ -14,6 +14,16 @@ abstract class Model
     protected $db = null;   
     protected $values = array();    
     protected $softdelete;
+    protected $errorMessages = array(        
+        'email' => 'Il campo <fieldname> non contiene un indirizzo mail valido.',
+        'fixlength' => 'Il campo <fieldname> solo valori con lunghezza pari a ',
+        'integer' => 'Il campo <fieldname> accetta solo numeri interi.',
+        'maxlength' => 'Il campo <fieldname> accetta massimo ',
+        'minlength' => 'Il campo <fieldname> accetta minimo ',
+        'notnull' => 'Il campo <fieldname> è obbligatorio.',
+        'numeric' => 'Il campo <fieldname> accetta solo valori numerici.',
+        'unique' => '<value> è già presente in archivio.'
+    );
 
     public function __construct($controller)
     {
@@ -45,6 +55,12 @@ abstract class Model
     public function setSequence($seq)
     {
         $this->sequence = $seq;
+    }
+    
+    public function setTable($table, $sequence = null)
+    {
+        $this->table = $table;
+        $this->sequence = $sequence;
     }
     
     public function delete()
@@ -153,12 +169,12 @@ abstract class Model
         $this->assocData();
     }
     
-    protected function addError($errorId, $field)
+    protected function addError($errorId, $field, $postfix = '')
     {
         $error = str_replace(
-            array('<fieldname>','<value>'),
-            array('<!--'.$field->html.'-->',$field->value),            
-            $this->errorMessages[$errorId]
+            array('<fieldname>', '<value>'),
+            array('<!--'.$field->html.'-->', $field->value),            
+            $this->errorMessages[$errorId].$postfix
         );
         $this->controller->response->error($field->html, $error);
     }
@@ -187,7 +203,11 @@ abstract class Model
         $this->repo->set('fields.'.$modelField->html, $modelField);
         return $modelField;
     }
-
+    
+    /**
+     * 
+     * @return void
+     */
     public function save()
     {
         //Recall before exec method with arbirtary code
@@ -235,7 +255,7 @@ abstract class Model
     {
         $val = $f->value;
         if (!$f->isNullable() && $val !== '0' && empty($val)) {
-            $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
+            $this->addError('notnull', $f);            
         }
         if ($f->isUnique() && $val) {
             $nOccurence = $this->db->execUnique(
@@ -248,34 +268,30 @@ abstract class Model
         }
         //Controllo la lunghezza massima della stringa. Se impostata.
         if ($f->maxlength && (strlen($val) > $f->maxlength)) {
-            $this->controller->response->error(
-                $f->html,
-                'Il campo <!--'.$f->html.'--> accetta massimo '.$f->maxlength.' caratteri.'
-            );
+            $this->addError('maxlength', $f, $f->maxlength.' caratteri');           
         } elseif ($f->minlength && (strlen($val) < $f->minlength)) {
-            $this->controller->response->error(
-                $f->html,
-                'Il campo <!--'.$f->html.'--> accetta minimo '.$f->minlength.' caratteri.'
-            );
+            $this->addError('minlength', $f, $f->minlength.' caratteri');
         } elseif ($f->fixlength && !in_array(strlen($val),$f->fixlength)) {
-            $this->controller->response->error(
-                $f->html,
-                'Il campo <!--'.$f->html.'--> accetta solo valori con lunghezza pari a '.implode(' o ',$f->fixlength).' caratteri'
-            );
+            $this->addError('fixlength', $f, implode(' o ',$f->fixlength).' caratteri');            
         }
         switch ($f->type) {
             case 'float':
             case 'money':
             case 'numeric':
             case 'number':
-                if (filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
-                    $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                if ($val && filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
+                    $this->addError('numeric', $f);                    
                 }
                 break;
             case 'integer':
             case 'int':
-                if (filter_var($val, \FILTER_VALIDATE_INT) === false) {
-                    $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                if ($val && filter_var($val, \FILTER_VALIDATE_INT) === false) {
+                    $this->addError('integer', $f);                    
+                }
+                break;
+            case 'email':
+                if (!empty($val) && filter_var($val, \FILTER_VALIDATE_EMAIL) === false) {
+                    $this->addError('email', $f);                    
                 }
                 break;
             case 'file':
