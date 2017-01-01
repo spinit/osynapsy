@@ -1,5 +1,5 @@
 <?php
-namespace Osynapsy\Core\Request;
+namespace Osynapsy\Core\Network;
 
 use Osynapsy\Core\Lib\Dictionary;
 

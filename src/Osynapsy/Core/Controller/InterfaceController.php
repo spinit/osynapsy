@@ -1,7 +1,7 @@
 <?php
 namespace Osynapsy\Core\Controller;
 
-use Osynapsy\Core\Request\Request;
+use Osynapsy\Core\Network\Request;
 
 interface InterfaceController
 {

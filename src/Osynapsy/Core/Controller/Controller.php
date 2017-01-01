@@ -1,7 +1,7 @@
 <?php
 namespace Osynapsy\Core\Controller;
 
-use Osynapsy\Core\Request\Request;
+use Osynapsy\Core\Network\Request;
 use Osynapsy\Ocl\Response\Html as HtmlResponse;
 use Osynapsy\Core\Response\Response;
 use Osynapsy\Core\Response\JsonResponse;
