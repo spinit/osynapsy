@@ -14,7 +14,7 @@ class ModelField
         'unique' => false,
         'value' => null
     );
-    private $model;
+    private $model;    
     public $type;
     
     public function __construct($model, $nameOnDb, $nameOnView, $type = 'string')
@@ -76,7 +76,7 @@ class ModelField
     public function setFixLength($length)
     {
         if (!is_array($length)) {
-            $len= array($length);
+            $length = array($length);
         }
         $this->fixlength = $length;
         return $this;
