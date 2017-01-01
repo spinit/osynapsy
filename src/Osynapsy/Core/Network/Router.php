@@ -89,9 +89,4 @@ class Router
         }
         return $this->get('current'.$key);
     }
-    
-    public function getRequest()
-    {
-        return $this->request;
-    }
 }
