@@ -52,15 +52,12 @@ class ModelField
             $html = $this->html;
             if (empty($_REQUEST[$html])) { 
                 $_REQUEST[$html] = $this->value; 
-            }
-            if (!$this->model->get('record.where.'.$this->name)) {
-                $this->model->set('record.where.'.$this->name, $this->value);
-            }
+            }            
         }
         return $this;
     }
 
-    public function isNullable($v=null)
+    public function isNullable($v = null)
     {
         if (is_null($v)) { 
             return $this->repo['nullable']; 
@@ -69,7 +66,7 @@ class ModelField
         return $this;
     }
 
-    public function isUnique($v=null)
+    public function isUnique($v = null)
     {
         if (is_null($v)) { 
             return $this->repo['unique']; 
@@ -78,12 +75,12 @@ class ModelField
         return $this;
     }
     
-    public function setFixLength($len)
+    public function setFixLength($length)
     {
-        if (!is_array($len)) {
-            $len= array($len);
+        if (!is_array($length)) {
+            $len= array($length);
         }
-        $this->fixlength = $len;
+        $this->fixlength = $length;
         return $this;
     }
     
@@ -95,7 +92,7 @@ class ModelField
     
     public function setMinLenght($length)
     {
-        $this->minlength = $lenght;
+        $this->minlength = $length;
         return $this;
     }
     
@@ -108,10 +105,7 @@ class ModelField
         if ($this->type == 'date' && !empty($val) && strpos($val, '/') !== false) {
             list($dd, $mm, $yy) = explode('/', $this->value );
             $this->value = "$yy-$mm-$dd";
-        }
-        if ($this->isPkey()) {
-            $this->model->set('record.where.'.$this->name, array($this->name, $this->value));
-        }
+        }       
         return $this;
     }
 }
