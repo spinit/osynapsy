@@ -78,11 +78,6 @@ abstract class Model
         $this->controller->response->go($this->repo->get('actions.after-delete'));
     }
 
-    private function formatCommand($action,$parameter=null)
-    {
-        return array('command' => array(array($action,$parameter)));
-    }
-    
     public function insert($values, $where=null)
     {
         $this->beforeInsert();        
@@ -195,82 +190,105 @@ abstract class Model
 
     public function save()
     {
+        //Recall before exec method with arbirtary code
         $this->beforeExec();
+        
+        //Init arrays
         $values = array();
         $where = array();
         $keys = array();
         
+        //skim the field list for check value and build $values, $where and $key list
         foreach ($this->repo->get('fields') as $f) {
-            $val = $f->value;
-            if (!$f->isNullable() && $val !== '0' && empty($val)) {
-                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
-            }
-            if ($f->isUnique() && $val) {
-                if ($this->db->execUnique("SELECT COUNT(*) FROM {$this->table} WHERE {$f->name} = ?", array($val))) {
-                    $this->addError('unique', $f);
-                }
-            }
-            switch ($f->type) {
-                case 'float':
-                case 'money':
-                case 'numeric':
-                case 'number':
-                    if (filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
-                    }
-                    break;
-                case 'integer':
-                case 'int':
-                    if (filter_var($val, FILTER_VALIDATE_INT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
-                    }
-                    break;
-                case 'file':
-                case 'image':
-                    if (is_array($_FILES) && array_key_exists($f->html, $_FILES)) {
-                        $val = ImageProcessor::upload($f->html);
-                    } else {
-                        //For prevent overwrite of db value
-                        $f->readonly = true;
-                    }
-                    break;
-            }
-            //Controllo la lunghezza massima della stringa. Se impostata.
-            if ($f->maxlength) {
-                if (strlen($val) > $f->maxlength) {
-                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta massimo '.$f->maxlength.' caratteri.');
-                }
-            }
-            if ($f->minlength) {
-                if (strlen($val) < $f->minlength) {
-                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta minimo '.$f->minlength.' caratteri.');
-                }
-            }
-            if ($f->fixlength) {
-                if (!in_array(strlen($val),$f->fixlength)) {
-                    $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> accetta solo valori con lunghezza pari a '.implode(' o ',$f->fixlength).' caratteri');
-                }
-            }
-            if ($f->isPkey()) {
-                $keys[] = $f->name;
-                if (!empty($val)) {
-                    $where[$f->name] = $val;
-                }
-            }
+            //Check if value respect rule
+            $val = $this->sanitizeFieldValue($f);
+            //If field isn't in readonly mode assign values to values list for store it in db
             if (!$f->readonly) {
                 $values[$f->name] = $val; 
-            }            
+            }
+            //If field isn't primary key skip key assignment
+            if (!$f->isPkey()) {
+                continue;
+            }
+            //Add field to keys list
+            $keys[] = $f->name;
+            //If field has value assign field to where condition
+            if (!empty($val)) {
+                $where[$f->name] = $val;
+            }
         }
+        //If occurred some error stop db updating
         if ($this->controller->response->error()) { 
             return; 
-        }        
-        //die(print_r($values,true).''.print_r($f,true));
+        }
+        //If where list is empty execute db insert else execute a db update
         if (empty($where)) {
             $this->insert($values, $keys);
         } else {
             $this->update($values, $where);
         }
+        //Recall after exec method with arbirtary code
         $this->afterExec();
+    }
+    
+    private function sanitizeFieldValue(&$f)
+    {
+        $val = $f->value;
+        if (!$f->isNullable() && $val !== '0' && empty($val)) {
+            $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> è obbligatorio.');
+        }
+        if ($f->isUnique() && $val) {
+            $nOccurence = $this->db->execUnique(
+                "SELECT COUNT(*) FROM {$this->table} WHERE {$f->name} = ?",
+                array($val)
+            );
+            if (!empty($nOccurence)) {
+                $this->addError('unique', $f);
+            }
+        }
+        //Controllo la lunghezza massima della stringa. Se impostata.
+        if ($f->maxlength && (strlen($val) > $f->maxlength)) {
+            $this->controller->response->error(
+                $f->html,
+                'Il campo <!--'.$f->html.'--> accetta massimo '.$f->maxlength.' caratteri.'
+            );
+        } elseif ($f->minlength && (strlen($val) < $f->minlength)) {
+            $this->controller->response->error(
+                $f->html,
+                'Il campo <!--'.$f->html.'--> accetta minimo '.$f->minlength.' caratteri.'
+            );
+        } elseif ($f->fixlength && !in_array(strlen($val),$f->fixlength)) {
+            $this->controller->response->error(
+                $f->html,
+                'Il campo <!--'.$f->html.'--> accetta solo valori con lunghezza pari a '.implode(' o ',$f->fixlength).' caratteri'
+            );
+        }
+        switch ($f->type) {
+            case 'float':
+            case 'money':
+            case 'numeric':
+            case 'number':
+                if (filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
+                    $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                }
+                break;
+            case 'integer':
+            case 'int':
+                if (filter_var($val, \FILTER_VALIDATE_INT) === false) {
+                    $this->controller->response->error($f->html,'Il campo '.$f->html.' non è numerico.');
+                }
+                break;
+            case 'file':
+            case 'image':
+                if (is_array($_FILES) && array_key_exists($f->html, $_FILES)) {
+                    $val = ImageProcessor::upload($f->html);
+                } else {
+                    //For prevent overwrite of db value
+                    $f->readonly = true;
+                }
+                break;
+        }
+        return $val;
     }
     
     public function softDelete($field, $value)
