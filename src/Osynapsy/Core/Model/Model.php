@@ -107,12 +107,7 @@ abstract class Model
             $this->db->insert($this->repo->get('table'), $values);
         } else {
             $lastId = $this->db->insert($this->repo->get('table'), $values);
-        }
-        if (!empty($lastId)) {
-            if ($pkField = $this->repo->get('pkField')) {
-                $pkField->setValue($lastId);
-            }
-        }
+        }        
         $this->afterInsert($lastId);
         switch ($this->repo->get('actions.after-insert')) {
             case 'back':
@@ -219,22 +214,22 @@ abstract class Model
         $keys = array();
         
         //skim the field list for check value and build $values, $where and $key list
-        foreach ($this->repo->get('fields') as $f) {
+        foreach ($this->repo->get('fields') as $field) {
             //Check if value respect rule
-            $val = $this->sanitizeFieldValue($f);
+            $value = $this->sanitizeFieldValue($field);
             //If field isn't in readonly mode assign values to values list for store it in db
-            if (!$f->readonly) {
-                $values[$f->name] = $val; 
+            if (!$field->readonly) {
+                $values[$field->name] = $value; 
             }
             //If field isn't primary key skip key assignment
-            if (!$f->isPkey()) {
+            if (!$field->isPkey()) {
                 continue;
             }
             //Add field to keys list
-            $keys[] = $f->name;
+            $keys[] = $field->name;
             //If field has value assign field to where condition
-            if (!empty($val)) {
-                $where[$f->name] = $val;
+            if (!empty($value)) {
+                $where[$field->name] = $value;
             }
         }
         //If occurred some error stop db updating
@@ -251,60 +246,60 @@ abstract class Model
         $this->afterExec();
     }
     
-    private function sanitizeFieldValue(&$f)
+    private function sanitizeFieldValue(&$field)
     {
-        $val = $f->value;
-        if (!$f->isNullable() && $val !== '0' && empty($val)) {
-            $this->addError('notnull', $f);            
+        $value = $field->value;
+        if (!$field->isNullable() && $value !== '0' && empty($value)) {
+            $this->addError('notnull', $field);            
         }
-        if ($f->isUnique() && $val) {
+        if ($field->isUnique() && $value) {
             $nOccurence = $this->db->execUnique(
-                "SELECT COUNT(*) FROM {$this->table} WHERE {$f->name} = ?",
-                array($val)
+                "SELECT COUNT(*) FROM {$this->table} WHERE {$field->name} = ?",
+                array($value)
             );
             if (!empty($nOccurence)) {
-                $this->addError('unique', $f);
+                $this->addError('unique', $field);
             }
         }
         //Controllo la lunghezza massima della stringa. Se impostata.
-        if ($f->maxlength && (strlen($val) > $f->maxlength)) {
-            $this->addError('maxlength', $f, $f->maxlength.' caratteri');           
-        } elseif ($f->minlength && (strlen($val) < $f->minlength)) {
-            $this->addError('minlength', $f, $f->minlength.' caratteri');
-        } elseif ($f->fixlength && !in_array(strlen($val),$f->fixlength)) {
-            $this->addError('fixlength', $f, implode(' o ',$f->fixlength).' caratteri');            
+        if ($field->maxlength && (strlen($value) > $field->maxlength)) {
+            $this->addError('maxlength', $field, $field->maxlength.' caratteri');           
+        } elseif ($field->minlength && (strlen($value) < $field->minlength)) {
+            $this->addError('minlength', $field, $field->minlength.' caratteri');
+        } elseif ($field->fixlength && !in_array(strlen($value),$field->fixlength)) {
+            $this->addError('fixlength', $field, implode(' o ',$field->fixlength).' caratteri');            
         }
-        switch ($f->type) {
+        switch ($field->type) {
             case 'float':
             case 'money':
             case 'numeric':
             case 'number':
-                if ($val && filter_var($val, \FILTER_VALIDATE_FLOAT) === false) {
-                    $this->addError('numeric', $f);                    
+                if ($value && filter_var($value, \FILTER_VALIDATE_FLOAT) === false) {
+                    $this->addError('numeric', $field);                    
                 }
                 break;
             case 'integer':
             case 'int':
-                if ($val && filter_var($val, \FILTER_VALIDATE_INT) === false) {
-                    $this->addError('integer', $f);                    
+                if ($value && filter_var($value, \FILTER_VALIDATE_INT) === false) {
+                    $this->addError('integer', $field);                    
                 }
                 break;
             case 'email':
-                if (!empty($val) && filter_var($val, \FILTER_VALIDATE_EMAIL) === false) {
-                    $this->addError('email', $f);                    
+                if (!empty($value) && filter_var($value, \FILTER_VALIDATE_EMAIL) === false) {
+                    $this->addError('email', $field);                    
                 }
                 break;
             case 'file':
             case 'image':
-                if (is_array($_FILES) && array_key_exists($f->html, $_FILES)) {
-                    $val = ImageProcessor::upload($f->html);
+                if (is_array($_FILES) && array_key_exists($field->html, $_FILES)) {
+                    $value = ImageProcessor::upload($field->html);
                 } else {
                     //For prevent overwrite of db value
-                    $f->readonly = true;
+                    $field->readonly = true;
                 }
                 break;
         }
-        return $val;
+        return $value;
     }
     
     public function softDelete($field, $value)
