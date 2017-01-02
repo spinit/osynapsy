@@ -30,7 +30,7 @@ class LoaderXml
     {        
         $name = $element->getName();
         $path = $parent . (empty($parent) ? '' : '.') . $name;
-        $attr = $attr = $this->grabAttribute($element);
+        $attr = $this->grabAttribute($element);
         if ($element->count() === 0) {           
             $attr['value'] = $this->grabValue($element, $path);                        
         }
