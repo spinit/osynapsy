@@ -35,16 +35,6 @@ class BaseTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actual);
     }
     
-    public function testEnv()
-    {
-        $kernel = $this->object->env();
-        $this->assertTrue($kernel instanceof \Osynapsy\Core\Env);
-        
-        $expected = 'hello word';
-        $actual = $this->object->env($expected);
-        $this->assertEquals($expected, $actual);
-    }
-    
     public function testKernel()
     {
         $kernel = $this->object->kernel();

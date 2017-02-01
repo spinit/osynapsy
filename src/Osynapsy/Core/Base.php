@@ -43,9 +43,18 @@ class Base
         if(count($args)>1) {
             self::$instances[$name] = $args[1];
         }
+        
+        // se non è inizializzato ed è previsto un inizializzatore ...
         if (!isset(self::$instances[$name]) and isset(self::$instanceDefault[$name])) {
-            $class = self::$instanceDefault[$name];
-            self::$instances[$name] = new $class;
+            // se l'inizializzatore è un "callable" viene chiamato
+            if (is_callable(self::$instanceDefault[$name])) {
+                $object = call_user_func(self::$instanceDefault[$name], array($this));
+            } else {
+                // altrimenti viene inizializzato come classe
+                $class = self::$instanceDefault[$name];
+                $object = new $class;
+            }
+            self::$instances[$name] = $object;
         }
         return @self::$instances[$name];
     }

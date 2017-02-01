@@ -24,6 +24,11 @@ class Kernel extends Base
     public $db = array();
     public $dba = array();
 
+    public function __call($name, $arguments)
+    {
+        return call_user_func_array($name, $arguments);
+    }
+
     public function init($fileconf, $requestRoute)
     {        
         $this->loadConfiguration($fileconf);
