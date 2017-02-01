@@ -7,10 +7,11 @@ class TagList extends Component
     {
         parent::__construct('div',$id);
         $this->class = 'osy-taglist';
-        kkernel::$page->add_script(OSY_WEB_ROOT.'/js/component/otaglist.js');
+        $this->requireJs('/__assets/osynapsy/Ocl/TagList/script.js');
     }
     
-	protected function __build_extra__(){
+	protected function __build_extra__()
+    {
 		$this->add(new hidden_box($this->id));
 		if ($_REQUEST['ajax'] == $this->id){
 			$this->__ajax_exec__();

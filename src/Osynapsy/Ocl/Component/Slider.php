@@ -1,15 +1,17 @@
 <?php 
-class oslider extends component {
+namespace Osynapsy\Ocl\Component;
 
-	private $bar;
-
-	public function __construct($id){
-        parent::__construct('div',$id);
-		$this->att('class','osy-slider');
-		kkernel::$page->add_script(OSY_WEB_ROOT.'/js/component/oslider.js');
+class Slider extends Component 
+{
+	public function __construct($id)
+    {
+        parent::__construct('div', $id);
+		$this->att('class', 'osy-slider');
+		$this->requireJs('/__assets/osynapsy/OclSlider/script.js');
     }
 	
-	protected function __build_extra__(){
+	protected function __build_extra__()
+    {
 		if ($range = $this->get_par('slider-range')){
 			$this->att('data-range',$range);
             $this->add(new hidden_box($this->id.'_min'));
@@ -42,6 +44,5 @@ class oslider extends component {
 		});
 		</script>');
 		//$this->add('<span class="osy-slider-result"></span>');
-
 	}
 }

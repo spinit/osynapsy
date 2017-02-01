@@ -2,23 +2,30 @@
 namespace Osynapsy\Core\Network;
 
 use Osynapsy\Core\Lib\Dictionary;
-
+/**
+ * 
+ * @author Pietro Celeste <p.celeste@spinit.it>
+ */
 class RouteCollection extends Dictionary
 {
     public function __construct()
     {
-        $this->repo = array(
-            'routes' => array()
+        parent::__construct(
+            array(
+                'routes' => array()
+            )
         );
     }
     
     public function addRoute($id, $route, $controller, $templateId = null)
     {
-        $param = array(
-            'path' => $route,
-            'controller' => $controller,
-            'templateId' => $templateId
+        $this->set(
+            'routes.'.$id,
+            array(
+                'path' => $route,
+                'controller' => $controller,
+                'templateId' => $templateId
+            )
         );
-        $this->set('routes.'.$id, $param);
     }
 }

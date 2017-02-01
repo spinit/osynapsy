@@ -4,6 +4,7 @@ namespace Osynapsy\Bcl\Component;
 use Osynapsy\Ocl\Component\Component;
 use Osynapsy\Ocl\Component\HiddenBox;
 use Osynapsy\Core\Lib\Tag as Tag;
+use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Bcl\Component\Panel as Panel;
 use Osynapsy\Bcl\Component\Tab;
 use Osynapsy\Bcl\Component\Alert;
@@ -16,10 +17,17 @@ class Form extends Component
     private $alertCount=0;
     private $body;
     private $foot;
-
+    private $repo;
+    
     public function __construct($name, $mainComponent = 'Panel', $tag = 'form')
     {
         parent::__construct($tag, $name);
+        $this->repo = new Dictionary(array(
+           'foot' => array(
+                'offset' => 1,            
+                'width' => 10
+            )
+        ));
         //Form setting
         $this->att('name',$name)
              ->att('method','post')
@@ -28,7 +36,8 @@ class Form extends Component
         //Body setting
         $this->body = new $mainComponent($name.'_panel', 'div');
         $this->body->par('label-position','inside');
-        $this->body->tagdep =& $this->tagdep;        
+        $this->body->tagdep =& $this->tagdep;  
+        
     }
     
     protected function __build_extra__()
@@ -46,11 +55,15 @@ class Form extends Component
         $container = $this->add(new Tag('div'))->att('class','content');
         $container->add($this->body);
         //Append foot
-        if ($this->foot) {
-            //$this->foot('<div style="clear : both;"></div>');
-            $this->body->put('',$this->foot->get(),10000,10,10,1);
-            //$container->add('<br>');
-            //$container->add($this->foot);
+        if ($this->foot) {           
+            $this->body->put(
+                '',
+                $this->foot->get(), 
+                10000, 
+                10, 
+                $this->repo->get('foot.width'),
+                $this->repo->get('foot.offset')
+            );
         }
     }
     
@@ -160,5 +173,13 @@ class Form extends Component
             $this->head('<small>'.$subTitle.'</small>');
         }
     }
-
+    
+    public function parameter($key, $value=null)
+    {
+        if (is_null($value)){
+            return $this->repo->get($key);
+        }
+        $this->repo->set($key, $value);
+        return $this;
+    }
 }

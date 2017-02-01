@@ -1,8 +1,7 @@
 <?php
 namespace Osynapsy\Core\Controller;
 
-use Osynapsy\Core\Request\Request;
-
+use Osynapsy\Core\Network\Request;
 use Osynapsy\Ocl\Response\Html as HtmlResponse;
 use Osynapsy\Core\Response\Response;
 use Osynapsy\Core\Response\JsonResponse;
@@ -18,7 +17,6 @@ abstract class Controller extends Base implements InterfaceController
     public $request;
     public $response;
     public $app;
-    private $view;
         
     public function __construct(Request $request = null, $db = null, $appController = null)
     {
@@ -70,6 +68,11 @@ abstract class Controller extends Base implements InterfaceController
         return $this->response;
     }
     
+    public function getRequest()
+    {
+        return $this->request;
+    }    
+    
     abstract public function indexAction();
     
     abstract public function init();
@@ -90,8 +93,9 @@ abstract class Controller extends Base implements InterfaceController
             return $this->execAction();
         }        
         $this->setResponse(new HtmlResponse());
-        if ($path = $this->singleton('kernel')->get('layouts.'.$this->templateId)) {
-            $this->response->template = $this->response->getBuffer($path, $this);            
+        $layoutPath = $this->request->get('app.layouts.'.$this->templateId);
+        if (!empty($layoutPath)) {
+            $this->response->template = $this->response->getBuffer($layoutPath, $this);            
         }
         if ($this->model) {
             $this->model->find();

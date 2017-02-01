@@ -1,14 +1,36 @@
-.menu {background-color: gray; color: white;}
-.menu > ul {margin: 0px; padding: 5px;}
-.menu > ul > li {display: inline-block; text-align: center; min-width: 100px; border-right: 1px solid white;}
-.menu > ul > li > a {color: white; text-decoration: none;}
+.menu {
+    background-color: gray; color: white;
+}
+
+.menu > ul {
+    margin: 0px; padding: 5px;
+}
+
+.menu > ul > li {
+    display: inline-block;
+    text-align: center;
+    min-width: 100px;
+    border-right: 1px solid white;
+}
+
+.menu > ul > li > a {
+    color: white;
+    text-decoration: none;
+}
 
 /**/
-.center {text-align: center;}
-.right {text-align: left;}
-/**/
-.field-in-error {border-color: red;}
+.center {
+    text-align: center;
+}
 
+.right {
+    text-align: left;
+}
+/**/
+
+.field-in-error {
+    border-color: red;
+}
 
 .has-error span.error {
     font-weight: normal; 
@@ -25,8 +47,19 @@
 }
 
 /*osy-datagrid-2*/
-.osy-datagrid-2-foot {text-align: center; margin-top: 5px; margin-bottom: 5px;}
-.gly-spin {  -webkit-animation: spin 2s infinite linear; -moz-animation: spin 2s infinite linear; -o-animation: spin 2s infinite linear; animation: spin 2s infinite linear;}
+.osy-datagrid-2-foot {
+    text-align: center; 
+    margin-top: 5px; 
+    margin-bottom: 5px;
+}
+
+.gly-spin {
+    -webkit-animation: spin 2s infinite linear; 
+    -moz-animation: spin 2s infinite linear; 
+    -o-animation: spin 2s infinite linear; 
+    animation: spin 2s infinite linear;
+}
+
 /**********wait mask***************/
 div#waitMask {
     position: absolute;
@@ -66,6 +99,7 @@ div#waitMask > div.message > div.progress {
     position: relative;
     overflow: hidden;
 }
+
 .btn-file input[type=file] {
     position: absolute;
     top: 0;

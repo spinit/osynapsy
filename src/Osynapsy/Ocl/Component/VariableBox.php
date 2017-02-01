@@ -16,19 +16,19 @@ class VariableBox extends Component
         }
         $sql = kkernel::ReplaceVariable($sql);
         $sql = kkernel::parse_string($sql);
-        list($typ,$sql) = kkernel::$dba->exec_unique($sql);
-        switch ($typ){
+        list($typ, $sql) = kkernel::$dba->exec_unique($sql);
+        switch ($typ) {
             case 'CMB':
                 $sql = kkernel::ReplaceVariable($sql);
-                $this->add(new combo_box($this->id))
+                $this->add(new ComboBox($this->id))
                      ->att('label',$this->label)
-                    ->par('datasource-sql',$sql);//Setto la risorsa per popolare la combo e la connessione al DB necessaria ad effettuare le query.
+                     ->par('datasource-sql',$sql);//Setto la risorsa per popolare la combo e la connessione al DB necessaria ad effettuare le query.
                 break;
             case 'TAR':
-                $this->add(new text_area($this->id))->att('style','width: 95%;')->att('rows','20');
+                $this->add(new TextArea($this->id))->att('style','width: 95%;')->att('rows','20');
                 break;
             default :
-                $this->add(new text_box($this->id))->att('style','width: 95%');
+                $this->add(new TextBox($this->id))->att('style','width: 95%');
                 break;
         }
     }

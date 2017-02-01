@@ -6,13 +6,17 @@ use Osynapsy\Core\Base;
 class ModelField extends Base
 {
     private $repo = array(
-        'value'       => null,
-        'is_pk'       => false,
-        'nullable'    => true, 
-        'readonly'    => false,
-        'rawvalue'    => null
+        'fixlength' => null,
+        'is_pk' => false,
+        'maxlength' => null,
+        'minlength' => null,
+        'nullable' => true, 
+        'readonly' => false,
+        'rawvalue' => null,
+        'unique' => false,
+        'value' => null
     );
-    private $model;
+    private $model;    
     public $type;
     
     public function __construct($model, $nameOnDb, $nameOnView, $type = 'string')
@@ -44,21 +48,16 @@ class ModelField extends Base
             return $this->is_pk; 
         } 
         $this->is_pk = $b;
-        $this->model->set('pkField', $this, true);
-        
         if ($this->value) {
             $html = $this->html;
             if (empty($_REQUEST[$html])) { 
                 $_REQUEST[$html] = $this->value; 
             }
-            if (!$this->model->get('record.where.'.$this->name)) {
-                $this->model->set('record.where.'.$this->name, $this->value);
-            }
         }
         return $this;
     }
 
-    public function isNullable($v=null)
+    public function isNullable($v = null)
     {
         if (is_null($v)) { 
             return $this->repo['nullable']; 
@@ -67,6 +66,36 @@ class ModelField extends Base
         return $this;
     }
 
+    public function isUnique($v = null)
+    {
+        if (is_null($v)) { 
+            return $this->repo['unique']; 
+        }
+        $this->repo['unique'] = $v;
+        return $this;
+    }
+    
+    public function setFixLength($length)
+    {
+        if (!is_array($length)) {
+            $length = array($length);
+        }
+        $this->fixlength = $length;
+        return $this;
+    }
+    
+    public function setMaxLength($length)
+    {
+        $this->maxlength = $length;
+        return $this;
+    }
+    
+    public function setMinLenght($length)
+    {
+        $this->minlength = $length;
+        return $this;
+    }
+    
     public function setValue($val, $def = null)
     {
         if ($val !== '0' && $val !== 0 && empty($val)) {
@@ -76,10 +105,7 @@ class ModelField extends Base
         if ($this->type == 'date' && !empty($val) && strpos($val, '/') !== false) {
             list($dd, $mm, $yy) = explode('/', $this->value );
             $this->value = "$yy-$mm-$dd";
-        }
-        if ($this->isPkey()) {
-            $this->model->set('record.where.'.$this->name, array($this->name, $this->value));
-        }
+        }       
         return $this;
     }
 }

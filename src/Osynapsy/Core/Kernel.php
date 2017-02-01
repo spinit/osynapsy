@@ -1,9 +1,8 @@
 <?php
 namespace Osynapsy\Core;
 
-use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Network\Router;
-use Osynapsy\Core\Request\Request;
+use Osynapsy\Core\Network\Request;
 use Osynapsy\Core\Driver\DbPdo;
 use Osynapsy\Core\Driver\DbOci;
 
@@ -32,12 +31,28 @@ class Kernel extends Base
     public function init($fileconf, $requestRoute)
     {        
         $this->loadConfiguration($fileconf);
-        $this->loadXmlConfig('/configuration/parameters/parameter','parameters','name','value');        
-        $this->loadXmlConfig('/configuration/layouts/layout','layouts','name','path');   
         $this->$request = new Request($_GET, $_POST, array(), $_COOKIE, $_FILES, $_SERVER);
-        $this->$router = new Router($requestRoute, $this->$request);
-        $this->$router->loadXml($this->$repo['xmlconfig'], '/configuration/routes/route');       
-        $this->$router->addRoute('OsynapsyAssetsManager','/__assets/osynapsy/?*','Osynapsy\\Core\\Helper\\AssetLoader','','Osynapsy');
+        $this->$request->set(
+            'app.parameters',
+            $this->loadXmlConfig('/configuration/parameters/parameter', 'name', 'value')
+        );
+        $this->$request->set(
+            'app.layouts',
+            $this->loadXmlConfig('/configuration/layouts/layout', 'name', 'path')
+        );        
+        $this->$router = new Router(
+            $requestRoute,
+            $this->$request
+        );
+        $this->loadRoutes(
+            $this->$repo['xmlconfig'],
+            '/configuration/routes/route'
+        );       
+        return $this->run();
+    }
+    
+    public static function run()
+    {
         if ($this->runAppController()) {
             $response = $this->runRouteController($this->$router->getRoute('controller'));
             if ($response !== false) {
@@ -47,7 +62,27 @@ class Kernel extends Base
         return $this->pageNotFound();
     }
     
-    private  function runAppController()
+    private function loadRoutes($xmlDocs, $path)
+    {
+        foreach ($xmlDocs as $appName => $xml) {
+            foreach ($xml->xpath($path) as $e) {
+                $id = (string) $e['id'];
+                $url = (string) $e['path'];
+                $ctl = (string) trim(str_replace(':', '\\', $e[0]));
+                $tpl = (string) $e['template'];
+                $this->$router->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
+            }
+        }
+        $this->$router->addRoute(
+            'OsynapsyAssetsManager',
+            '/__assets/osynapsy/?*',
+            'Osynapsy\\Core\\Controller\\AssetLoader',
+            '',
+            'Osynapsy'
+        );
+    }
+    
+    private function runAppController()
     {
         $app = $this->$router->getRoute('application');      
         if (empty($app)) {
@@ -115,60 +150,28 @@ class Kernel extends Base
         } 
         return new DbPdo($connectionString);
     }
-    
-    public function loadXmlConfig($xpath, $dest, $kkey, $kval)
+    public function loadXmlConfig($xpath, $kkey, $kval)
     {
+        $result = array();
         foreach ($this->$repo['xmlconfig'] as $xml) {
             foreach ($xml->xpath($xpath) as $e) {
-                $this->$repo[$dest][$e[$kkey]->__toString()] = (isset($e[$kval]) ? $e[$kval]->__toString() : '');
+                $result[$e[$kkey]->__toString()] = (isset($e[$kval]) ? $e[$kval]->__toString() : '');
             }
         }
-    }
-
-    public  function set($p,$v)
-    {
-        $ksearch = explode('.',$p);
-        $klast   = count($ksearch)-1;
-        $target = &$this->$repo;
-        foreach($ksearch as $i => $k){
-            if ($klast == $i){
-                $target[$k] = $v;
-            } elseif (array_key_exists($k,$target)) {
-                $target = &$target[$k];
-            } elseif(count($ksearch) != ($i+1)) {
-                $target[$k] = array();
-                $target = &$target[$k];
-            }
-        }
+        return $result;
     }
     
-    public function get($p)
+    public function loadRoute($xmlDocs, $path)
     {
-        if (empty($p)) {
-            return $this->$repo;
-        }
-        $ksearch = explode('.',$p);
-        $target = $this->$repo;
-        foreach ($ksearch as $k) {
-            if (!is_array($target)) {
-                return $target;
+        foreach ($xmlDocs as $appName => $xml) {
+            foreach ($xml->xpath($path) as $e) {
+                $id = (string) $e['id'];
+                $url = (string) $e['path'];
+                $ctl = (string) trim(str_replace(':', '\\', $e[0]));
+                $tpl = (string) $e['template'];
+                $this->$router->addRoute($id, $url, $ctl, $tpl, $appName, $e->attributes());                
             }
-            $target = array_key_exists($k, $target) ? $target[$k] : null;
         }        
-        return $target;
-    }
-
-    public  function sendEmail($from, $a, $subject, $body, $html=false)
-    {
-        $head = "From: $from\r\n".
-                "Reply-To: $from\r\n".
-                "X-Mailer: PHP/".phpversion()."\n";
-        if ($html) {
-          $head .= "MIME-Version: 1.0\n";
-          $head .= "Content-Type: text/html; charset=\"iso-8859-1\"\n";
-          $head .= "Content-Transfer-Encoding: 7bit\n\n";
-        }
-        return $this->env()->mail($a,$subject,$body,$head," -f ".$from);
     }
     
     public  function pageNotFound($message = 'Page not found')

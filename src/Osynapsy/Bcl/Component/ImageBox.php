@@ -1,9 +1,8 @@
 <?php
 namespace Osynapsy\Bcl\Component;
 
-use Osynapsy\Helper\Image;
+use Osynapsy\Core\Helper\Image;
 use Osynapsy\Ocl\Component\Component;
-use Osynapsy\Ocl\Component\HiddenBox;
 use Osynapsy\Core\Lib\Tag;
 
 class ImageBox extends Component
@@ -31,18 +30,18 @@ class ImageBox extends Component
     
     public function __construct($id)
     {        
-        $this->requireCss('/__assets/osynapsy/Bcl/ImageBox2/style.css');
-        $this->requireCss('/__assets/osynapsy/Bcl/ImageBox2/cropper.css');
-        $this->requireJs('/__assets/osynapsy/Bcl/ImageBox2/cropper.js');
-        $this->requireJs('/__assets/osynapsy/Bcl/ImageBox2/script.js');
-        parent::__construct('div',$id);
+        $this->requireCss('/__assets/osynapsy/Lib/cropper-2.3.2/cropper.css');
+        $this->requireJs('/__assets/osynapsy/Lib/cropper-2.3.2/cropper.js');
+        $this->requireCss('/__assets/osynapsy/Bcl/ImageBox/style.css');        
+        $this->requireJs('/__assets/osynapsy/Bcl/ImageBox/script.js');
+        parent::__construct('div',$id.'_box');
         $this->att('class','osy-imagebox-bcl')->att('data-action','save');
-        $this->add(new HiddenBox($id));
+        //$this->add(new HiddenBox($id));
         $this->dummy = $this->add(new Tag('label'))
                             ->att('class','osy-imagebox-dummy')
-                            ->att('for',$this->id.'_file');
+                            ->att('for',$id);
         $file = $this->add(new Tag('input'));
-        $file->att('type','file')->att('class','hidden')->att('id',$id.'_file')->name = $id;
+        $file->att('type','file')->att('class','hidden')->att('id',$id)->name = $id;
         
         $this->toolbar = new Tag('div');
         $this->toolbar->att('class','osy-imagebox-bcl-cmd');
@@ -71,10 +70,10 @@ class ImageBox extends Component
     
     private function getImage()
     {
-        if (empty($_REQUEST[$this->id])) {
+        if (empty($_REQUEST[$this->dummy->for])) {
             return;
         }
-        $this->image['webPath'] = $_REQUEST[$this->id];
+        $this->image['webPath'] = $_REQUEST[$this->dummy->for];
         $this->image['diskPath'] = $_SERVER['DOCUMENT_ROOT'].$this->image['webPath'];
         if (file_exists($this->image['diskPath'])) {
             $this->image['dimension'] = getimagesize($this->image['diskPath']);
@@ -154,9 +153,10 @@ class ImageBox extends Component
         return $this;
     }
     
-    public static function crop($path, $x, $y, $w, $h)
+    public static function crop($path, $newWidth, $newHeight, $x, $y, $w, $h)
     {
-        $img = new Image($path);
+        $img = new Image($path);       
+        $img->resize($newWidth, $newHeight);
         $img->crop($x, $y, $w, $h);
         $img->save($path);
         return true;

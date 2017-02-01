@@ -3,7 +3,7 @@ namespace Osynapsy\Core\Model;
 
 use Osynapsy\Core\Lib\Dictionary;
 use Osynapsy\Core\Model\ModelField;
-use Osynapsy\Core\Util\ImageProcessor;
+use Osynapsy\Core\Helper\ImageProcessor;
 
 abstract class Model
 {
@@ -14,6 +14,16 @@ abstract class Model
     protected $db = null;   
     protected $values = array();    
     protected $softdelete;
+    protected $errorMessages = array(        
+        'email' => 'Il campo <fieldname> non contiene un indirizzo mail valido.',
+        'fixlength' => 'Il campo <fieldname> solo valori con lunghezza pari a ',
+        'integer' => 'Il campo <fieldname> accetta solo numeri interi.',
+        'maxlength' => 'Il campo <fieldname> accetta massimo ',
+        'minlength' => 'Il campo <fieldname> accetta minimo ',
+        'notnull' => 'Il campo <fieldname> è obbligatorio.',
+        'numeric' => 'Il campo <fieldname> accetta solo valori numerici.',
+        'unique' => '<value> è già presente in archivio.'
+    );
 
     public function __construct($controller)
     {
@@ -47,6 +57,12 @@ abstract class Model
         $this->sequence = $seq;
     }
     
+    public function setTable($table, $sequence = null)
+    {
+        $this->table = $table;
+        $this->sequence = $sequence;
+    }
+    
     public function delete()
     {
         $this->beforeDelete();
@@ -78,11 +94,6 @@ abstract class Model
         $this->controller->response->go($this->repo->get('actions.after-delete'));
     }
 
-    private function formatCommand($action,$parameter=null)
-    {
-        return array('command' => array(array($action,$parameter)));
-    }
-    
     public function insert($values, $where=null)
     {
         $this->beforeInsert();        
@@ -96,12 +107,7 @@ abstract class Model
             $this->db->insert($this->repo->get('table'), $values);
         } else {
             $lastId = $this->db->insert($this->repo->get('table'), $values);
-        }
-        if (!empty($lastId)) {
-            if ($pkField = $this->repo->get('pkField')) {
-                $pkField->setValue($lastId);
-            }
-        }
+        }        
         $this->afterInsert($lastId);
         switch ($this->repo->get('actions.after-insert')) {
             case 'back':
@@ -158,16 +164,24 @@ abstract class Model
         $this->assocData();
     }
     
+    protected function addError($errorId, $field, $postfix = '')
+    {
+        $error = str_replace(
+            array('<fieldname>', '<value>'),
+            array('<!--'.$field->html.'-->', $field->value),            
+            $this->errorMessages[$errorId].$postfix
+        );
+        $this->controller->response->error($field->html, $error);
+    }
+    
     public function assocData()
     {
-        if (is_array($this->values)) {
-            foreach ($this->repo->get('fields') as $k => $f) {
-                if (!array_key_exists($f->html, $_REQUEST) && array_key_exists($f->name, $this->values)) {
-                    if ($f->html == '_fk') { 
-                        $_REQUEST[$f->html] = $this->values[ $f->name ]; 
-                    }
-                    $_REQUEST[ $f->html ] = $this->values[ $f->name ];
-                }
+        if (!is_array($this->values)) {
+            return;
+        }
+        foreach ($this->repo->get('fields') as $f) {
+            if (!array_key_exists($f->html, $_REQUEST) && array_key_exists($f->name, $this->values)) {
+                $_REQUEST[ $f->html ] = $this->values[ $f->name ];
             }
         }
     }
@@ -184,79 +198,108 @@ abstract class Model
         $this->repo->set('fields.'.$modelField->html, $modelField);
         return $modelField;
     }
-
+    
+    /**
+     * 
+     * @return void
+     */
     public function save()
     {
+        //Recall before exec method with arbirtary code
         $this->beforeExec();
+        
+        //Init arrays
         $values = array();
         $where = array();
         $keys = array();
         
-        foreach ($this->repo->get('fields') as $k => $f) {
-            $val = $f->value;
-            if (in_array($f->type,array('file','image')) && empty($val)) {
-                //print_r($f);
-                //exit;
-                //continue;
+        //skim the field list for check value and build $values, $where and $key list
+        foreach ($this->repo->get('fields') as $field) {
+            //Check if value respect rule
+            $value = $this->sanitizeFieldValue($field);
+            //If field isn't in readonly mode assign values to values list for store it in db
+            if (!$field->readonly) {
+                $values[$field->name] = $value; 
             }
-            if (!$f->isNullable() && $val !== '0' && empty($val)) {
-                $this->controller->response->error($f->html,'Il campo <!--'.$f->html.'--> � obbligatorio.');
-            }
-            switch ($f->type) {
-                case 'float':
-                case 'money':
-                case 'numeric':
-                case 'number':
-                    if (filter_var($val, FILTER_VALIDATE_FLOAT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non � numerico.');
-                    }
-                    break;
-                case 'integer':
-                case 'int':
-                    if (filter_var($val, FILTER_VALIDATE_INT) === false) {
-                        $this->controller->response->error($f->html,'Il campo '.$f->html.' non � numerico.');
-                    }
-                    break;
-            }
-            if ($f->isPkey()) {
-                $keys[] = $f->name;
-                if (!empty($val)) {
-                    $where[$f->name] = $val;
-                }
-            }
-            if (!$f->readonly) {
-                $values[$f->name] = $val; 
-            }
-
-            if (!is_array($_FILES) || !array_key_exists($f->html, $_FILES)) {
+            //If field isn't primary key skip key assignment
+            if (!$field->isPkey()) {
                 continue;
             }
-            $values[$f->name] = ImageProcessor::upload($f->html);
-            //Make thumbnail
-            if ($th = $f->thumbnail) {
-                if (!is_array($th) && count($th) === count($th, COUNT_RECURSIVE)) {
-                    $th = array($th);
-                }
-                foreach ($th as $dim) {
-                    $thumbnailName = ImageProcessor::thumbnail(
-                        $_SERVER['DOCUMENT_ROOT'].$values[$f->name],
-                        $dim
-                    );
-                    if (!empty($dim[2])) {
-                        $values[$dim[2]] = $thumbnailName;
-                    }
-                }
+            //Add field to keys list
+            $keys[] = $field->name;
+            //If field has value assign field to where condition
+            if (!empty($value)) {
+                $where[$field->name] = $value;
             }
         }
+        //If occurred some error stop db updating
         if ($this->controller->response->error()) { 
             return; 
-        }        
+        }
+        //If where list is empty execute db insert else execute a db update
         if (empty($where)) {
             $this->insert($values, $keys);
         } else {
             $this->update($values, $where);
         }
+        //Recall after exec method with arbirtary code
         $this->afterExec();
+    }
+    
+    private function sanitizeFieldValue(&$field)
+    {
+        $value = $field->value;
+        if (!$field->isNullable() && $value !== '0' && empty($value)) {
+            $this->addError('notnull', $field);            
+        }
+        if ($field->isUnique() && $value) {
+            $nOccurence = $this->db->execUnique(
+                "SELECT COUNT(*) FROM {$this->table} WHERE {$field->name} = ?",
+                array($value)
+            );
+            if (!empty($nOccurence)) {
+                $this->addError('unique', $field);
+            }
+        }
+        //Controllo la lunghezza massima della stringa. Se impostata.
+        if ($field->maxlength && (strlen($value) > $field->maxlength)) {
+            $this->addError('maxlength', $field, $field->maxlength.' caratteri');           
+        } elseif ($field->minlength && (strlen($value) < $field->minlength)) {
+            $this->addError('minlength', $field, $field->minlength.' caratteri');
+        } elseif ($field->fixlength && !in_array(strlen($value),$field->fixlength)) {
+            $this->addError('fixlength', $field, implode(' o ',$field->fixlength).' caratteri');            
+        }
+        switch ($field->type) {
+            case 'float':
+            case 'money':
+            case 'numeric':
+            case 'number':
+                if ($value && filter_var($value, \FILTER_VALIDATE_FLOAT) === false) {
+                    $this->addError('numeric', $field);                    
+                }
+                break;
+            case 'integer':
+            case 'int':
+                if ($value && filter_var($value, \FILTER_VALIDATE_INT) === false) {
+                    $this->addError('integer', $field);                    
+                }
+                break;
+            case 'email':
+                if (!empty($value) && filter_var($value, \FILTER_VALIDATE_EMAIL) === false) {
+                    $this->addError('email', $field);                    
+                }
+                break;
+            case 'file':
+            case 'image':
+                if (is_array($_FILES) && array_key_exists($field->html, $_FILES)) {
+                    $value = ImageProcessor::upload($field->html);
+                } else {
+                    //For prevent overwrite of db value
+                    $field->readonly = true;
+                }
+                break;
+        }
+        return $value;
     }
     
     public function softDelete($field, $value)
